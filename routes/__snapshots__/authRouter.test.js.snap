@@ -1,0 +1,8 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`test /users/login test responce 1`] = `
+{
+  "email": Any<String>,
+  "subscription": Any<String>,
+}
+`;
