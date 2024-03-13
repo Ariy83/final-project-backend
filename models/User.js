@@ -13,15 +13,16 @@ const userSchema = new Schema({
     required: [true, "Email is required"],
     unique: true,
   },
-  subscription: {
-    type: String,
-    enum: ["starter", "pro", "business"],
-    default: "starter",
+  waterrate: {
+    type: Number,
+    default: 2000,
+    min: 1,
+    max: 15000,
   },
   verify: {
     type: Boolean,
-    default: false,
-    required: true,
+    default: true,
+    required: false,
   },
   verificationToken: {
     type: String,
