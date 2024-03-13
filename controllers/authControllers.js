@@ -24,32 +24,32 @@ const register = async (req, res) => {
 
   const verificationToken = nanoid();
 
-  const avatarURL = gravatar.url(email, {
-    protocol: "https",
-    s: "250",
-    r: "g",
-    d: "robohash",
-  });
+  // const avatarURL = gravatar.url(email, {
+  //   protocol: "https",
+  //   s: "250",
+  //   r: "g",
+  //   d: "robohash",
+  // });
 
   const newUser = await authServices.signup({
     ...req.body,
-    avatarURL,
+    // avatarURL,
     verificationToken,
   });
 
-  // const verifyEmail = {
-  //   to: email,
-  //   subject: "Verify email",
-  //   html: `<a target="_blank" href="${BASE_URL}/users/verify/${verificationToken}">CLick to verify email</a>`,
-  // };
+  const verifyEmail = {
+    to: email,
+    subject: "Verify email",
+    html: `<a target="_blank" href="${BASE_URL}/users/verify/${verificationToken}">CLick to verify email</a>`,
+  };
 
-  // await sendEmail(verifyEmail);
+  await sendEmail(verifyEmail);
 
   res.status(201).json({
     user: {
       email: newUser.email,
-      waterrate: newUser.waterrate,
-      avatarURL: newUser.avatarURL,
+      //water_rate: newUser.water_rate,
+      // avatarURL: newUser.avatarURL,
     },
   });
 };
@@ -110,35 +110,29 @@ const login = async (req, res) => {
     id: user._id,
   };
 
-  const token = jwt.sign(payload, JWT_SECRET, { expiresIn: "22h" });
+  const token = jwt.sign(payload, JWT_SECRET, { expiresIn: "24h" });
 
   await authServices.setToken(user._id, token);
 
   res.json({
     token,
-    user: { email, subscription: user.subscription },
+    user: { email },
   });
 };
 
 const getCurrent = (req, res) => {
-  const { email, subscription } = req.user;
+  const { email } = req.user;
 
-  res.json({ email, subscription });
+  res.json({ email });
 };
 
 const logout = async (req, res) => {
   const { _id } = req.user;
   await authServices.setToken(_id);
 
-  res.status(204);
-};
-
-const updateSubscription = async (req, res) => {
-  const { _id } = req.user;
-  const { subscription } = req.body;
-  await authServices.setSubscription(_id, subscription);
-
-  res.json({ subscription });
+  res.status(204).json({
+    message: "You are logged out",
+  });
 };
 
 const updateAvatar = async (req, res) => {
@@ -168,6 +162,5 @@ export default {
   login: ctrlWrapper(login),
   getCurrent: ctrlWrapper(getCurrent),
   logout: ctrlWrapper(logout),
-  updateSubscription: ctrlWrapper(updateSubscription),
   updateAvatar: ctrlWrapper(updateAvatar),
 };

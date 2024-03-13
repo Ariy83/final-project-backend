@@ -11,10 +11,6 @@ export const setToken = (id, token = "") => {
   return User.findByIdAndUpdate(id, { token });
 };
 
-export const setSubscription = (id, subscription) => {
-  return User.findByIdAndUpdate(id, { subscription });
-};
-
 export const setAvatar = (id, avatarURL) => {
   return User.findByIdAndUpdate(id, { avatarURL });
 };

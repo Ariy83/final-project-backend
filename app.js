@@ -15,6 +15,7 @@ app.use(express.json());
 app.use(express.static("public"));
 
 app.use("/users", authRouter);
+
 app.use("/api/water-notes", waterNotesRouter);
 
 app.use((_, res) => {
