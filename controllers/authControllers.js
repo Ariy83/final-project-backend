@@ -24,16 +24,16 @@ const register = async (req, res) => {
 
   const verificationToken = nanoid();
 
-  const avatarURL = gravatar.url(email, {
-    protocol: "https",
-    s: "250",
-    r: "g",
-    d: "robohash",
-  });
+  // const avatarURL = gravatar.url(email, {
+  //   protocol: "https",
+  //   s: "250",
+  //   r: "g",
+  //   d: "robohash",
+  // });
 
   const newUser = await authServices.signup({
     ...req.body,
-    avatarURL,
+    // avatarURL,
     verificationToken,
   });
 
@@ -48,8 +48,8 @@ const register = async (req, res) => {
   res.status(201).json({
     user: {
       email: newUser.email,
-      waterrate: newUser.waterrate,
-      avatarURL: newUser.avatarURL,
+      water_rate: newUser.water_rate,
+      // avatarURL: newUser.avatarURL,
     },
   });
 };
@@ -121,9 +121,9 @@ const login = async (req, res) => {
 };
 
 const getCurrent = (req, res) => {
-  const { email, subscription } = req.user;
+  const { email } = req.user;
 
-  res.json({ email, subscription });
+  res.json({ email });
 };
 
 const logout = async (req, res) => {

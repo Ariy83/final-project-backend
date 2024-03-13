@@ -14,7 +14,7 @@ authRouter.post(
   authControllers.register
 );
 
-authRouter.get("/verify/:verificationToken", authControllers.verify);
+// authRouter.get("/verify/:verificationToken", authControllers.verify);
 
 // authRouter.post(
 //   "/verify",
