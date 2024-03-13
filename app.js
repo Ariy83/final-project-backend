@@ -5,7 +5,7 @@ import mongoose from "mongoose";
 import "dotenv/config";
 
 import authRouter from "./routes/authRouter.js";
-import contactsRouter from "./routes/contactsRouter.js";
+import waterNotesRouter from "./routes/waterNotesRouter.js";
 
 const app = express();
 
@@ -15,7 +15,7 @@ app.use(express.json());
 app.use(express.static("public"));
 
 app.use("/users", authRouter);
-app.use("/api/watertracker", contactsRouter);
+app.use("/api/water-notes", waterNotesRouter);
 
 app.use((_, res) => {
   res.status(404).json({ message: "Route not found" });
