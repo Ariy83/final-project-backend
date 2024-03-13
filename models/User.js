@@ -3,9 +3,10 @@ import { handleSaveError, setUpdateSettings } from "./hooks.js";
 import { emailRegexp } from "../constants/regexp.js";
 
 const userSchema = new Schema({
-  password: {
+  username: {
     type: String,
-    required: [true, "Password is required"],
+    maxLength: 32,
+    default: null,
   },
   email: {
     type: String,
@@ -13,15 +14,27 @@ const userSchema = new Schema({
     required: [true, "Email is required"],
     unique: true,
   },
-  waterrate: {
+  password: {
+    type: String,
+    minLength: 8,
+    maxLength: 64,
+    required: [true, "Password is required"],
+  },
+
+  water_rate: {
     type: Number,
     default: 2000,
     min: 1,
     max: 15000,
   },
+  gender: {
+    type: String,
+    enum: ["male", "female"],
+    default: null,
+  },
   verify: {
     type: Boolean,
-    default: true,
+    default: false,
     required: false,
   },
   verificationToken: {
