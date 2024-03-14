@@ -1,5 +1,5 @@
 import * as authServices from "../services/authServices.js";
-import { findUser, updateUser } from "../services/userServices.js";
+import { findUser, updateUser, updateWater } from "../services/userServices.js";
 import HttpError from "../helpers/HttpError.js";
 import sendEmail from "../helpers/sendEmail.js";
 import ctrlWrapper from "../decorators/ctrlWrapper.js";
@@ -164,6 +164,12 @@ const updateAvatar = async (req, res) => {
   res.json({ avatarURL: newPath });
 };
 
+const updateWaterRate = async (req, res) => {
+  const { _id } = req.user;
+  const result = await updateWater(_id, req.body);
+  res.json(result)
+}
+
 export default {
   register: ctrlWrapper(register),
   // verify: ctrlWrapper(verify),
@@ -172,4 +178,5 @@ export default {
   getCurrent: ctrlWrapper(getCurrent),
   logout: ctrlWrapper(logout),
   updateAvatar: ctrlWrapper(updateAvatar),
+  updateWaterRate: ctrlWrapper(updateWaterRate)
 };
