@@ -1,11 +1,11 @@
 import WaterNote from "../models/WaterNote.js";
 
 export function listWaterNotes() {
-  return WaterNote.find({}, "-__v");
+  return WaterNote.find({});
 }
 
 export function getWaterNotesByFilter(filter, query = {}) {
-  return WaterNote.find(filter, "-__v", query);
+  return WaterNote.find(filter, query);
 }
 
 export function getWaterNotesCountByFilter(filter) {
@@ -13,11 +13,11 @@ export function getWaterNotesCountByFilter(filter) {
 }
 
 export function getWaterNoteById(id) {
-  return WaterNote.findById(id, "-__v");
+  return WaterNote.findById(id);
 }
 
 export function getOneWaterNoteByFilter(filter) {
-  return WaterNote.findOne(filter, "-__v");
+  return WaterNote.findOne(filter);
 }
 
 export function removeWaterNote(id) {

@@ -1,20 +1,38 @@
 import { Schema, model } from "mongoose";
 import { handleSaveError, setUpdateSettings } from "./hooks.js";
 
-const waterNoteSchema = new Schema({
-  date: {
-    type: String,
-    required: [true, "Set date for water note"],
+const waterNoteSchema = new Schema(
+  {
+    notes: [
+      {
+        time: {
+          type: String,
+          required: [true, "Set time for water note"],
+        },
+        waterVolume: {
+          type: Number,
+          required: [true, "Set water volume for water note"],
+        },
+      },
+    ],
+
+    date: {
+      type: Date,
+      default: new Date(),
+    },
+
+    totalWaterVolume: {
+      type: Number,
+      default: 0,
+    },
+
+    owner: {
+      type: Schema.Types.ObjectId,
+      ref: "user",
+    },
   },
-  waterVolume: {
-    type: String,
-    required: [true, "Set water volume for water note"],
-  },
-  owner: {
-    type: Schema.Types.ObjectId,
-    ref: "user",
-  },
-});
+  { versionKey: false }
+);
 
 waterNoteSchema.post("save", handleSaveError);
 
