@@ -1,15 +1,15 @@
 import * as authServices from "../services/authServices.js";
-import { findUser, updateUser, updateWater } from "../services/userServices.js";
+import { findUser, updateWater } from "../services/userServices.js";
 import HttpError from "../helpers/HttpError.js";
-import sendEmail from "../helpers/sendEmail.js";
 import ctrlWrapper from "../decorators/ctrlWrapper.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-// import gravatar from "gravatar";
 import fs from "fs/promises";
 import path from "path";
 import Jimp from "jimp";
-import { nanoid } from "nanoid";
+// import gravatar from "gravatar";
+// import { nanoid } from "nanoid";
+// import sendEmail from "../helpers/sendEmail.js";
 
 const avatarDir = path.resolve("public", "avatars");
 
@@ -57,7 +57,6 @@ const register = async (req, res) => {
     token,
     user: {
       email: newUser.email,
-      //water_rate: newUser.water_rate,
       // avatarURL: newUser.avatarURL,
     },
   });
@@ -167,8 +166,8 @@ const updateAvatar = async (req, res) => {
 const updateWaterRate = async (req, res) => {
   const { _id } = req.user;
   const result = await updateWater(_id, req.body);
-  res.json(result)
-}
+  res.json(result);
+};
 
 export default {
   register: ctrlWrapper(register),
@@ -178,5 +177,5 @@ export default {
   getCurrent: ctrlWrapper(getCurrent),
   logout: ctrlWrapper(logout),
   updateAvatar: ctrlWrapper(updateAvatar),
-  updateWaterRate: ctrlWrapper(updateWaterRate)
+  updateWaterRate: ctrlWrapper(updateWaterRate),
 };

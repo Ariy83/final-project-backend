@@ -5,30 +5,14 @@ import {
   addWaterNote,
   editWaterNoteByFilter,
   updateWaterNoteStatusByFilter,
-  getWaterNotesCountByFilter,
 } from "../services/waterNotesServices.js";
 import HttpError from "../helpers/HttpError.js";
 import ctrlWrapper from "../decorators/ctrlWrapper.js";
 
 const getAllWaterNotes = async (req, res) => {
   const { _id: owner } = req.user;
-  const { page = 1, limit = 20 } = req.query;
-  const skip = limit * (page - 1);
-
-  const { favorite } = req.query;
-
-  if (favorite) {
-    const total = await getWaterNotesCountByFilter({ owner, favorite });
-    const result = await getWaterNotesByFilter(
-      { owner, favorite },
-      { skip, limit }
-    );
-    res.json({ total, result });
-  } else {
-    const total = await getWaterNotesCountByFilter({ owner });
-    const result = await getWaterNotesByFilter({ owner }, { skip, limit });
-    res.json({ total, result });
-  }
+  const result = await getWaterNotesByFilter({ owner });
+  res.json({ result });
 };
 
 const getOneWaterNote = async (req, res) => {
