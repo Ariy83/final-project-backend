@@ -10,7 +10,3 @@ export const signup = async (data) => {
 export const setToken = (id, token = "") => {
   return User.findByIdAndUpdate(id, { token });
 };
-
-export const setAvatar = (id, avatarURL) => {
-  return User.findByIdAndUpdate(id, { avatarURL });
-};
