@@ -196,7 +196,13 @@ const updateUser = async (req, res) => {
   }
 
   const newUser = await userServices.updateUser(owner, changedData);
-  res.status(201).json({ newUser });
+  res.status(201).json({ user: {
+      email: newUser.email,
+      username: newUser.username,
+      gender: newUser.gender,
+      avatarURL: newUser.avatarURL,
+    }
+  });
 };
 
 const updateWaterRate = async (req, res) => {
