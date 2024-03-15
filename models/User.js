@@ -48,9 +48,9 @@ const userSchema = new Schema(
     avatarURL: {
       type: String,
       default: null,
-    }
+    },
   },
-  { versionKey: false }
+  { versionKey: false, timestamps: true }
 );
 
 userSchema.post("save", handleSaveError);
