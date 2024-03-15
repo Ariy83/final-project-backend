@@ -1,24 +1,28 @@
-import * as authServices from '../services/authServices.js';
-import * as userServices from '../services/userServices.js';
-import {findUser, findUserById, updateWater} from '../services/userServices.js';
-import HttpError from '../helpers/HttpError.js';
-import ctrlWrapper from '../decorators/ctrlWrapper.js';
-import bcrypt from 'bcrypt';
-import jwt from 'jsonwebtoken';
-import Jimp from 'jimp';
-import cloudinary from '../helpers/claudinary.js';
-import {unlink} from 'fs/promises';
+import * as authServices from "../services/authServices.js";
+import * as userServices from "../services/userServices.js";
+import {
+  findUser,
+  findUserById,
+  updateWater,
+} from "../services/userServices.js";
+import HttpError from "../helpers/HttpError.js";
+import ctrlWrapper from "../decorators/ctrlWrapper.js";
+import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
+import Jimp from "jimp";
+import cloudinary from "../helpers/claudinary.js";
+import { unlink } from "fs/promises";
 // import gravatar from "gravatar";
 // import { nanoid } from "nanoid";
 // import sendEmail from "../helpers/sendEmail.js";
 
-const {JWT_SECRET, BASE_URL} = process.env;
+const { JWT_SECRET, BASE_URL } = process.env;
 
 const register = async (req, res) => {
-  const {email} = req.body;
-  const user = await findUser({email});
+  const { email } = req.body;
+  const user = await findUser({ email });
   if (user) {
-    throw HttpError(409, 'Email in use');
+    throw HttpError(409, "Email in use");
   }
 
   // const verificationToken = nanoid();
@@ -31,7 +35,7 @@ const register = async (req, res) => {
   // });
 
   const newUser = await authServices.signup({
-    ...req.body
+    ...req.body,
     // avatarURL,
     // verificationToken,
   });
@@ -45,19 +49,19 @@ const register = async (req, res) => {
   // await sendEmail(verifyEmail);
 
   const payload = {
-    id: newUser._id
+    id: newUser._id,
   };
 
-  const token = jwt.sign(payload, JWT_SECRET, {expiresIn: '24h'});
+  const token = jwt.sign(payload, JWT_SECRET, { expiresIn: "24h" });
 
   await authServices.setToken(newUser._id, token);
 
   res.status(201).json({
     token,
     user: {
-      email: newUser.email
+      email: newUser.email,
       // avatarURL: newUser.avatarURL,
-    }
+    },
   });
 };
 
@@ -97,102 +101,106 @@ const register = async (req, res) => {
 // };
 
 const login = async (req, res) => {
-  const {email, password} = req.body;
+  const { email, password } = req.body;
 
-  const user = await findUser({email});
+  const user = await findUser({ email });
+
   if (!user) {
-    throw HttpError(401, 'Email or password is wrong');
+    throw HttpError(401, "Email or password is wrong");
   }
 
   if (!user.verify) {
-    throw HttpError(401, 'Email not verified');
+    throw HttpError(401, "Email not verified");
   }
 
   const passwordCompare = await bcrypt.compare(password, user.password);
   if (!passwordCompare) {
-    throw HttpError(401, 'Email or password is wrong');
+    throw HttpError(401, "Email or password is wrong");
   }
 
   const payload = {
-    id: user._id
+    id: user._id,
   };
 
-  const token = jwt.sign(payload, JWT_SECRET, {expiresIn: '24h'});
+  const token = jwt.sign(payload, JWT_SECRET, { expiresIn: "24h" });
 
   await authServices.setToken(user._id, token);
 
   res.json({
     token,
-    user: {email}
+    user: {
+      email,
+      username: user.username,
+      gender: user.gender,
+      avatarURL: user.avatarURL,
+      waterRate: user.waterRate,
+    },
   });
 };
 
 const getCurrent = (req, res) => {
-  const {email} = req.user;
+  const { email } = req.user;
 
-  res.json({email});
+  res.json({ email });
 };
 
 const logout = async (req, res) => {
-  const {_id} = req.user;
+  const { _id } = req.user;
   await authServices.setToken(_id);
 
   res.status(204).json({
-    message: 'You are logged out'
+    message: "You are logged out",
   });
 };
 
 const updateUser = async (req, res) => {
-  const {_id: owner, password} = req.user;
-  const {new_password, password: old_password, email} = req.body;
-  const changedData = {...req.body}
+  const { _id: owner, password } = req.user;
+  const { new_password, password: old_password, email } = req.body;
+  const changedData = { ...req.body };
 
   if (old_password && new_password) {
     const user = await findUserById(owner);
     if (!user) {
-      throw HttpError(404, 'User not found!');
+      throw HttpError(404, "User not found!");
     }
 
     const passwordCompare = await bcrypt.compare(old_password, password);
     if (!passwordCompare) {
-      throw HttpError(401, 'Incorrect password!');
+      throw HttpError(401, "Incorrect password!");
     }
 
     changedData.password = await bcrypt.hash(new_password, 8);
   }
 
-  const user = await findUser({email});
+  const user = await findUser({ email });
   if (user) {
-    throw HttpError(409, 'Email is already used');
+    throw HttpError(409, "Email is already used");
   }
 
   if (req.file) {
-    const {path: filePath} = req.file;
+    const { path: filePath } = req.file;
     Jimp.read(filePath)
       .then((image) => {
-        return image
-          .cover(250, 250)
-          .quality(60)
-          .write(filePath);
+        return image.cover(250, 250).quality(60).write(filePath);
       })
       .catch((err) => {
         console.error(err);
       });
 
-    const {url: photo} = await cloudinary.uploader.upload(filePath, {
-      folder: 'avatars'
+    const { url: photo } = await cloudinary.uploader.upload(filePath, {
+      folder: "avatars",
     });
 
-    changedData.avatarURL = photo
+    changedData.avatarURL = photo;
     await unlink(filePath);
   }
 
   const newUser = await userServices.updateUser(owner, changedData);
-  res.status(201).json({newUser});
+  res.status(201).json({ newUser });
 };
 
 const updateWaterRate = async (req, res) => {
-  const {_id} = req.user;
+  const { _id } = req.user;
   const result = await updateWater(_id, req.body);
   res.json(result);
 };
@@ -205,5 +213,5 @@ export default {
   getCurrent: ctrlWrapper(getCurrent),
   logout: ctrlWrapper(logout),
   updateUser: ctrlWrapper(updateUser),
-  updateWaterRate: ctrlWrapper(updateWaterRate)
+  updateWaterRate: ctrlWrapper(updateWaterRate),
 };
