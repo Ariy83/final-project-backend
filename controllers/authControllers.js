@@ -13,10 +13,10 @@ import Jimp from "jimp";
 import cloudinary from "../helpers/claudinary.js";
 import { unlink } from "fs/promises";
 // import gravatar from "gravatar";
-// import { nanoid } from "nanoid";
-// import sendEmail from "../helpers/sendEmail.js";
+import { nanoid } from "nanoid";
+import sendEmail from "../helpers/sendEmail.js";
 
-const { JWT_SECRET, BASE_URL } = process.env;
+const { JWT_SECRET, BASE_URL, TEMPLATE_ID, SENDGRID_FROM } = process.env;
 
 const register = async (req, res) => {
   const { email } = req.body;
@@ -25,7 +25,7 @@ const register = async (req, res) => {
     throw HttpError(409, "Email in use");
   }
 
-  // const verificationToken = nanoid();
+  const verificationToken = nanoid();
 
   // const avatarURL = gravatar.url(email, {
   //   protocol: "https",
@@ -37,27 +37,31 @@ const register = async (req, res) => {
   const newUser = await authServices.signup({
     ...req.body,
     // avatarURL,
-    // verificationToken,
+    verificationToken,
   });
 
-  // const verifyEmail = {
-  //   to: email,
-  //   subject: "Verify email",
-  //   html: `<a target="_blank" href="${BASE_URL}/users/verify/${verificationToken}">CLick to verify email</a>`,
-  // };
-
-  // await sendEmail(verifyEmail);
-
-  const payload = {
-    id: newUser._id,
+  const verifyEmail = {
+    
+    from: {
+      email: SENDGRID_FROM,
+      name: "Water tracker",
+    },
+    personalizations:[{
+      to: [{email:email}],
+      
+      dynamic_template_data: {
+        "email": email,
+        "BASE_URL": BASE_URL,
+        "verificationToken": verificationToken,
+      },
+    }],
+    template_id: TEMPLATE_ID,
+    
   };
 
-  const token = jwt.sign(payload, JWT_SECRET, { expiresIn: "24h" });
-
-  await authServices.setToken(newUser._id, token);
+  await sendEmail(verifyEmail);
 
   res.status(201).json({
-    token,
     user: {
       email: newUser.email,
       // avatarURL: newUser.avatarURL,
@@ -65,40 +69,44 @@ const register = async (req, res) => {
   });
 };
 
-// const verify = async (req, res) => {
-//   const { verificationToken } = req.params;
-//   const user = await findUser({ verificationToken });
+const verify = async (req, res) => {
+  const { verificationToken } = req.params;
+  const user = await userServices.findUser({ verificationToken });
+ 
+  if (!user) {
+    throw HttpError(404, "User not found");
+  }
 
-//   if (!user) {
-//     throw HttpError(404, "User not found");
-//   }
+  await userServices.updateUser(
+    { _id: user._id },
+    { verify: true, verificationToken: "" }
+  );
 
-//   await updateUser({ _id: user._id }, { verify: true, verificationToken: "" });
+  res.json({ message: "Verification successful" });
+};
 
-//   res.json({ message: "Verification successful" });
-// };
+const resendVerifyEmail = async (req, res) => {
+  const { email } = req.body;
+  const user = await userServices.findUser({ email });
 
-// const resendVerifyEmail = async (req, res) => {
-//   const { email } = req.body;
-//   const user = await findUser({ email });
+  if (!user) {
+    throw HttpError(404, "User not found");
+  }
+  if (user.verify) {
+    throw HttpError(400, "Verification has already been passed");
+  }
 
-//   if (!user) {
-//     throw HttpError(404, "User not found");
-//   }
-//   if (user.verify) {
-//     throw HttpError(400, "Verification has already been passed");
-//   }
+  const verifyEmail = {
+    to: email,
+    subject: "Verify email",
+    html: `<a target="_blank" style="background-color: #007bff; color: #fff; text-decoration: none; padding: 10px 20px; border-radius: 5px;" href="${BASE_URL}/users/verify/${user.verificationToken}">CLick to verify email</a>
+   `,
+  };
 
-//   const verifyEmail = {
-//     to: email,
-//     subject: "Verify email",
-//     html: `<a target="_blank" href="${BASE_URL}/users/verify/${user.verificationToken}">CLick to verify email</a>`,
-//   };
+  await sendEmail(verifyEmail);
 
-//   await sendEmail(verifyEmail);
-
-//   res.json({ message: "Verification email sent" });
-// };
+  res.json({ message: "Verification email sent" });
+};
 
 const login = async (req, res) => {
   const { email, password } = req.body;
@@ -141,13 +149,15 @@ const login = async (req, res) => {
 const getCurrent = (req, res) => {
   const { email, username, gender, avatarURL, waterRate } = req.user;
 
-  res.json({ user: {
+  res.json({
+    user: {
       email,
       username,
       gender,
       avatarURL,
-      waterRate
-    } });
+      waterRate,
+    },
+  });
 };
 
 const logout = async (req, res) => {
@@ -207,12 +217,13 @@ const updateUser = async (req, res) => {
     await cloudinary.uploader.destroy(avatarURL);
   }
 
-  res.status(201).json({ user: {
+  res.status(201).json({
+    user: {
       email: newUser.email,
       username: newUser.username,
       gender: newUser.gender,
       avatarURL: newUser.avatarURL,
-    }
+    },
   });
 };
 
@@ -222,10 +233,12 @@ const updateWaterRate = async (req, res) => {
   res.json(result);
 };
 
+const verifyUser = async (req, res) => {};
+
 export default {
   register: ctrlWrapper(register),
-  // verify: ctrlWrapper(verify),
-  // resendVerifyEmail: ctrlWrapper(resendVerifyEmail),
+  verify: ctrlWrapper(verify),
+  resendVerifyEmail: ctrlWrapper(resendVerifyEmail),
   login: ctrlWrapper(login),
   getCurrent: ctrlWrapper(getCurrent),
   logout: ctrlWrapper(logout),
