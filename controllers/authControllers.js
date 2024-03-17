@@ -139,9 +139,15 @@ const login = async (req, res) => {
 };
 
 const getCurrent = (req, res) => {
-  const { email } = req.user;
+  const { email, username, gender, avatarURL, waterRate } = req.user;
 
-  res.json({ email });
+  res.json({ user: {
+      email,
+      username,
+      gender,
+      avatarURL,
+      waterRate
+    } });
 };
 
 const logout = async (req, res) => {
