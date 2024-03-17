@@ -1,7 +1,7 @@
 import express from "express";
 import validateBody from "../decorators/validateBody.js";
 import authControllers from "../controllers/authControllers.js";
-import { signupSchema, waterRateChangeSchema } from "../schemas/usersSchemas.js";
+import { signupSchema, waterRateChangeSchema, verifySchema } from "../schemas/usersSchemas.js";
 import authenticate from "../middlewares/authenticate.js";
 import upload from '../middlewares/upload.js';
 // import upload from "../middlewares/upload.js";
@@ -15,13 +15,13 @@ authRouter.post(
   authControllers.register
 );
 
-// authRouter.get("/verify/:verificationToken", authControllers.verify);
+authRouter.get("/verify/:verificationToken", authControllers.verify);
 
-// authRouter.post(
-//   "/verify",
-//   validateBody(verifySchema),
-//   authControllers.resendVerifyEmail
-// );
+authRouter.post(
+  "/verify",
+  validateBody(verifySchema),
+  authControllers.resendVerifyEmail
+);
 
 authRouter.post("/login", validateBody(signupSchema), authControllers.login);
 
