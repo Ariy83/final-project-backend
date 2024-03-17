@@ -7,6 +7,9 @@ import "dotenv/config";
 import authRouter from "./routes/authRouter.js";
 import waterNotesRouter from "./routes/waterNotesRouter.js";
 
+import swaggerUi from "swagger-ui-express";
+import swaggerDocument from "./swagger.json" with { type: "json" };
+
 const app = express();
 
 app.use(morgan("tiny"));
@@ -16,6 +19,8 @@ app.use(express.json());
 app.use("/api/users", authRouter);
 
 app.use("/api/water-notes", waterNotesRouter);
+
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 app.use((_, res) => {
   res.status(404).json({ message: "Route not found" });
