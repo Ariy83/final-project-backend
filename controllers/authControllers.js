@@ -154,7 +154,7 @@ const logout = async (req, res) => {
 };
 
 const updateUser = async (req, res) => {
-  const { _id: owner, password } = req.user;
+  const { _id: owner, password, avatarURL } = req.user;
   const { new_password, password: old_password, email } = req.body;
   const changedData = { ...req.body };
 
@@ -196,6 +196,11 @@ const updateUser = async (req, res) => {
   }
 
   const newUser = await userServices.updateUser(owner, changedData);
+
+  if (req.file && newUser) {
+    await cloudinary.uploader.destroy(avatarURL);
+  }
+
   res.status(201).json({ user: {
       email: newUser.email,
       username: newUser.username,
