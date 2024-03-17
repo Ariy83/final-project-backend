@@ -16,7 +16,7 @@ import { unlink } from "fs/promises";
 import { nanoid } from "nanoid";
 import sendEmail from "../helpers/sendEmail.js";
 
-const { JWT_SECRET, BASE_URL } = process.env;
+const { JWT_SECRET, BASE_URL, TEMPLATE_ID, SENDGRID_FROM } = process.env;
 
 const register = async (req, res) => {
   const { email } = req.body;
@@ -41,23 +41,27 @@ const register = async (req, res) => {
   });
 
   const verifyEmail = {
-    to: email,
-    subject: "Verify email",
-    html: `<a target="_blank" href="${BASE_URL}/users/verify/${verificationToken}">Click to verify email</a>`,
+    
+    from: {
+      email: SENDGRID_FROM,
+      name: "Water tracker",
+    },
+    personalizations:[{
+      to: [{email:email}],
+      
+      dynamic_template_data: {
+        "email": email,
+        "BASE_URL": BASE_URL,
+        "verificationToken": verificationToken,
+      },
+    }],
+    template_id: TEMPLATE_ID,
+    
   };
 
   await sendEmail(verifyEmail);
 
-  // const payload = {
-  //   id: newUser._id,
-  // };
-
-  // const token = jwt.sign(payload, JWT_SECRET, { expiresIn: "24h" });
-
-  // await authServices.setToken(newUser._id, token);
-
   res.status(201).json({
-    // token,
     user: {
       email: newUser.email,
       // avatarURL: newUser.avatarURL,
@@ -68,7 +72,7 @@ const register = async (req, res) => {
 const verify = async (req, res) => {
   const { verificationToken } = req.params;
   const user = await userServices.findUser({ verificationToken });
-  console.log(user);
+ 
   if (!user) {
     throw HttpError(404, "User not found");
   }
@@ -92,25 +96,11 @@ const resendVerifyEmail = async (req, res) => {
     throw HttpError(400, "Verification has already been passed");
   }
 
-  const emailHTML = (email) => {
-    return 
-  };
-
   const verifyEmail = {
     to: email,
     subject: "Verify email",
-    html: ` <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-    <h2 style="color: #333;">Verify Your Email Address</h2>
-    <p>Dear ${email},</p>
-    <p>Thank you for signing up with Water Tracker. To complete your registration and gain access to our platform, we need to verify your email address.</p>
-    <p>Please click on the link below to verify your email:</p>
-    <p><a target="_blank" style="background-color: #007bff; color: #fff; text-decoration: none; padding: 10px 20px; border-radius: 5px;" href="${BASE_URL}/users/verify/${user.verificationToken}">CLick to verify email</a>
-    <p>If you are unable to click the link, you can copy and paste it into your browser's address bar.</p>
-    <p>Please note that this link is valid for 24h, after which you will need to request a new verification email.</p>
-
-    <p>Thank you for choosing Water Tracker.</p>
-    <p>Best regards,<br>Tracker water team<br></p>
-  </div>`,
+    html: `<a target="_blank" style="background-color: #007bff; color: #fff; text-decoration: none; padding: 10px 20px; border-radius: 5px;" href="${BASE_URL}/users/verify/${user.verificationToken}">CLick to verify email</a>
+   `,
   };
 
   await sendEmail(verifyEmail);
@@ -159,13 +149,15 @@ const login = async (req, res) => {
 const getCurrent = (req, res) => {
   const { email, username, gender, avatarURL, waterRate } = req.user;
 
-  res.json({ user: {
+  res.json({
+    user: {
       email,
       username,
       gender,
       avatarURL,
-      waterRate
-    } });
+      waterRate,
+    },
+  });
 };
 
 const logout = async (req, res) => {
