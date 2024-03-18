@@ -295,7 +295,7 @@
           "user": {
             "email": "Capybara@example.com",
             "username": "Capybara",
-            "gender": "man || woman",
+            "gender": "male || female",
             "avatarURL": "https://en.wikipedia.org/wiki/Capybara#/media/File:Hydrochoeris_hydrochaeris_in_Brazil_in_Petr%C3%B3polis,_Rio_de_Janeiro,_Brazil_09.jpg",
             "waterRate": "2000"
           }
@@ -335,7 +335,7 @@
           "user": {
             "email": "Capybara@example.com",
             "username": "Capybara",
-            "gender": "man || woman",
+            "gender": "male || female",
             "avatarURL": "https://en.wikipedia.org/wiki/Capybara#/media/File:Hydrochoeris_hydrochaeris_in_Brazil_in_Petr%C3%B3polis,_Rio_de_Janeiro,_Brazil_09.jpg",
             "waterRate": "2000"
           }
@@ -406,7 +406,7 @@
           "old_password": "qwerty123",
           "new_password": "qwerty12345",
           "username": "Capybara",
-          "gender": "man || woman",
+          "gender": "male || female",
           "avatarURL": "https://en.wikipedia.org/wiki/Capybara#/media/File:Hydrochoeris_hydrochaeris_in_Brazil_in_Petr%C3%B3polis,_Rio_de_Janeiro,_Brazil_09.jpg"
         }
       },
@@ -440,7 +440,7 @@
           "user": {
             "email": "Capybara@example.com",
             "username": "Capybara",
-            "gender": "man || woman",
+            "gender": "male || female",
             "avatarURL": "https://en.wikipedia.org/wiki/Capybara#/media/File:Hydrochoeris_hydrochaeris_in_Brazil_in_Petr%C3%B3polis,_Rio_de_Janeiro,_Brazil_09.jpg"
           }
         }
