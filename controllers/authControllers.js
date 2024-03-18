@@ -16,7 +16,13 @@ import { unlink } from "fs/promises";
 import { nanoid } from "nanoid";
 import sendEmail from "../helpers/sendEmail.js";
 
-const { JWT_SECRET, BASE_URL, TEMPLATE_ID, SENDGRID_FROM } = process.env;
+const {
+  JWT_SECRET,
+  BASE_URL,
+  TEMPLATE_ID,
+  SENDGRID_FROM,
+  TEMPLATE_ID_PASSWORD,
+} = process.env;
 
 const register = async (req, res) => {
   const { email } = req.body;
@@ -41,29 +47,29 @@ const register = async (req, res) => {
   });
 
   const verifyEmail = {
-    
     from: {
       email: SENDGRID_FROM,
       name: "Water tracker",
     },
-    personalizations:[{
-      to: [{email:email}],
-      
-      dynamic_template_data: {
-        "email": email,
-        "BASE_URL": BASE_URL,
-        "verificationToken": verificationToken,
+    personalizations: [
+      {
+        to: [{ email: email }],
+
+        dynamic_template_data: {
+          email: email,
+          BASE_URL: BASE_URL,
+          verificationToken: verificationToken,
+        },
       },
-    }],
+    ],
     template_id: TEMPLATE_ID,
-    
   };
 
   await sendEmail(verifyEmail);
 
   res.status(201).json({
     user: {
-      email: newUser.email
+      email: newUser.email,
       // avatarURL: newUser.avatarURL,
     },
   });
@@ -72,7 +78,7 @@ const register = async (req, res) => {
 const verify = async (req, res) => {
   const { verificationToken } = req.params;
   const user = await userServices.findUser({ verificationToken });
- 
+
   if (!user) {
     throw HttpError(404, "User not found");
   }
@@ -82,7 +88,9 @@ const verify = async (req, res) => {
     { verify: true, verificationToken: "" }
   );
 
-  res.redirect('http://localhost:5173/capybara-components-frontend/signin?message=Verification%20successful');
+  res.redirect(
+    "http://localhost:5173/capybara-components-frontend/signin?message=Verification%20successful"
+  );
 };
 
 const resendVerifyEmail = async (req, res) => {
@@ -97,29 +105,27 @@ const resendVerifyEmail = async (req, res) => {
   }
 
   const verifyEmail = {
-    
     from: {
       email: SENDGRID_FROM,
       name: "Water tracker",
     },
-    personalizations:[{
-      to: [{email:email}],
-      
-      dynamic_template_data: {
-        "email": email,
-        "BASE_URL": BASE_URL,
-        "verificationToken": verificationToken,
+    personalizations: [
+      {
+        to: [{ email: email }],
+
+        dynamic_template_data: {
+          email: email,
+          BASE_URL: BASE_URL,
+          verificationToken: verificationToken,
+        },
       },
-    }],
+    ],
     template_id: TEMPLATE_ID,
-    
   };
 
   await sendEmail(verifyEmail);
 
   res.json({ message: "Verification email sent" });
-  
- 
 };
 
 const login = async (req, res) => {
@@ -247,7 +253,40 @@ const updateWaterRate = async (req, res) => {
   res.json(result);
 };
 
-const verifyUser = async (req, res) => {};
+const forgot_password = async (req, res) => {
+  const { email } = req.body;
+
+  const user = await userServices.findUser({ email });
+  if (!user) {
+    throw HttpError(404, "User not found!");
+  } else {
+    const verifyEmail = {
+      from: {
+        email: SENDGRID_FROM,
+        name: "Forgot password",
+      },
+      personalizations: [
+        {
+          to: [{ email: email }],
+
+          dynamic_template_data: {
+            email: email,
+            id: user._id.toString(),
+            BASE_URL: BASE_URL,
+          },
+        },
+      ],
+      template_id: TEMPLATE_ID_PASSWORD,
+    };
+
+    await sendEmail(verifyEmail);
+
+    res.json({
+      success: true,
+      message: "Password reset link is sent to your email!",
+    });
+  }
+};
 
 export default {
   register: ctrlWrapper(register),
@@ -258,4 +297,5 @@ export default {
   logout: ctrlWrapper(logout),
   updateUser: ctrlWrapper(updateUser),
   updateWaterRate: ctrlWrapper(updateWaterRate),
+  forgot_password: ctrlWrapper(forgot_password),
 };

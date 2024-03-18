@@ -1,7 +1,7 @@
 import express from "express";
 import validateBody from "../decorators/validateBody.js";
 import authControllers from "../controllers/authControllers.js";
-import { signupSchema, waterRateChangeSchema, verifySchema } from "../schemas/usersSchemas.js";
+import { signupSchema, waterRateChangeSchema, verifySchema, forgotPassword } from "../schemas/usersSchemas.js";
 import authenticate from "../middlewares/authenticate.js";
 import upload from '../middlewares/upload.js';
 // import upload from "../middlewares/upload.js";
@@ -32,5 +32,7 @@ authRouter.get("/current", authenticate, authControllers.getCurrent);
 authRouter.patch("/update", authenticate, upload.single("avatarURL"), authControllers.updateUser);
 
 authRouter.patch("/water-rate", authenticate, validateBody(waterRateChangeSchema), authControllers.updateWaterRate)
+
+authRouter.post("/forgot_password", validateBody(forgotPassword), authControllers.forgot_password)
 
 export default authRouter;
