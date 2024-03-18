@@ -220,10 +220,11 @@ const updateUser = async (req, res) => {
 const updateWaterRate = async (req, res) => {
   const { _id } = req.user;
   const result = await updateWater(_id, req.body);
-  res.json(result);
+  const { waterRate } = result;
+  res.json({ waterRate });
 };
 
-const verifyUser = async (req, res) => {};
+const verifyUser = async (req, res) => { };
 
 export default {
   register: ctrlWrapper(register),
