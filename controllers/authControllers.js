@@ -17,6 +17,7 @@ import { nanoid } from "nanoid";
 import sendEmail from "../helpers/sendEmail.js";
 import resetTokenSchema from "../models/ResetToken.js";
 import ResetToken from "../models/ResetToken.js";
+import User from "../models/User.js";
 
 const {
   JWT_SECRET,
@@ -279,7 +280,6 @@ const forgotPassword = async (req, res) => {
   const resetToken = new ResetToken({ owner: user._id, token: nanoid() });
   await resetToken.save();
 
-
   const verifyEmail = {
     from: {
       email: SENDGRID_FROM,
@@ -308,24 +308,26 @@ const forgotPassword = async (req, res) => {
   });
 };
 
+
+
 const resetPassword = async (req, res) => {
-  const { passsword } = req.body;
+  const { password, email } = req.body;
 
   const user = await User.findById(req.user._id)
  if(!user) {
   throw HttpError (404, "User not found!")
  }
 
-const isSamePassword = await user.passwordCompare(passsword)
-if(isSamePassword) {
+
+if(user.password === password) {
   throw HttpError (409, "Password must be different!")
  }
 
-if(passsword.trim().length < 8 || passsword.trim().length > 64){
+if(password.trim().length < 8 || password.trim().length > 64){
   throw HttpError (401, "Password must be 8 to 64 characters long!")
 }
 
-user.passsword = passsword.trim()
+user.password = password.trim()
 await user.save()
 
 await ResetToken.findOneAndDelete({owner: user._id})

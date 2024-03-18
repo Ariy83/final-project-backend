@@ -29,8 +29,8 @@ resetTokenSchema.pre("save", async function (next){
 })
 
 resetTokenSchema.methods.compareToken = async function (token){
-    const result = await bcrypt.compare(token, this.token);
-return result;
+    const result = await bcrypt.compareSync(token, this.token);
+    return result;
 }
 
 const ResetToken = model("resetToken", resetTokenSchema);
