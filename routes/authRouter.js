@@ -4,6 +4,7 @@ import authControllers from "../controllers/authControllers.js";
 import { signupSchema, waterRateChangeSchema, verifySchema, forgotPassword } from "../schemas/usersSchemas.js";
 import authenticate from "../middlewares/authenticate.js";
 import upload from '../middlewares/upload.js';
+import isResetTokenValid from "../middlewares/isResetTokenValid.js";
 // import upload from "../middlewares/upload.js";
 
 const authRouter = express.Router();
@@ -33,6 +34,8 @@ authRouter.patch("/update", authenticate, upload.single("avatarURL"), authContro
 
 authRouter.patch("/water-rate", authenticate, validateBody(waterRateChangeSchema), authControllers.updateWaterRate)
 
-authRouter.post("/forgot_password", validateBody(forgotPassword), authControllers.forgot_password)
+authRouter.post("/forgot-password", validateBody(forgotPassword), authControllers.forgotPassword)
+
+authRouter.post("/reset-password", isResetTokenValid, authControllers.resetPassword)
 
 export default authRouter;

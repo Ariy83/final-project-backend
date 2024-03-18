@@ -15,6 +15,8 @@ import { unlink } from "fs/promises";
 // import gravatar from "gravatar";
 import { nanoid } from "nanoid";
 import sendEmail from "../helpers/sendEmail.js";
+import resetTokenSchema from "../models/ResetToken.js";
+import ResetToken from "../models/ResetToken.js";
 
 const {
   JWT_SECRET,
@@ -250,42 +252,108 @@ const updateUser = async (req, res) => {
 const updateWaterRate = async (req, res) => {
   const { _id } = req.user;
   const result = await updateWater(_id, req.body);
+  // console.log(result)
   res.json(result);
 };
 
-const forgot_password = async (req, res) => {
-  const { email } = req.body;
 
+
+const forgotPassword = async (req, res) => {
+  const { email } = req.body;
+  if (!email) {
+    throw HttpError(404, "Please provide the valid email!");
+  }
   const user = await userServices.findUser({ email });
   if (!user) {
     throw HttpError(404, "User not found!");
-  } else {
-    const verifyEmail = {
-      from: {
-        email: SENDGRID_FROM,
-        name: "Forgot password",
-      },
-      personalizations: [
-        {
-          to: [{ email: email }],
-
-          dynamic_template_data: {
-            email: email,
-            id: user._id.toString(),
-            BASE_URL: BASE_URL,
-          },
-        },
-      ],
-      template_id: TEMPLATE_ID_PASSWORD,
-    };
-
-    await sendEmail(verifyEmail);
-
-    res.json({
-      success: true,
-      message: "Password reset link is sent to your email!",
-    });
   }
+
+  const token = await ResetToken.findOne({ owner: user._id });
+  if (token) {
+    throw HttpError(
+      404,
+      "Only after one hour you can reques for new password!"
+    );
+  }
+
+  const resetToken = new ResetToken({ owner: user._id, token: nanoid() });
+  await resetToken.save();
+
+
+  const verifyEmail = {
+    from: {
+      email: SENDGRID_FROM,
+      name: "Forgot password",
+    },
+    personalizations: [
+      {
+        to: [{ email: email }],
+
+        dynamic_template_data: {
+          email: email,
+          id: user._id.toString(),
+          BASE_URL: BASE_URL,
+          token: resetToken.token,
+        },
+      },
+    ],
+    template_id: TEMPLATE_ID_PASSWORD,
+  };
+
+  await sendEmail(verifyEmail);
+
+  res.json({
+    success: true,
+    message: "Password reset link is sent to your email!",
+  });
+};
+
+const resetPassword = async (req, res) => {
+  const { passsword } = req.body;
+
+  const user = await User.findById(req.user._id)
+ if(!user) {
+  throw HttpError (404, "User not found!")
+ }
+
+const isSamePassword = await user.passwordCompare(passsword)
+if(isSamePassword) {
+  throw HttpError (409, "Password must be different!")
+ }
+
+if(passsword.trim().length < 8 || passsword.trim().length > 64){
+  throw HttpError (401, "Password must be 8 to 64 characters long!")
+}
+
+user.passsword = passsword.trim()
+await user.save()
+
+await ResetToken.findOneAndDelete({owner: user._id})
+
+const verifyEmail = {
+  from: {
+    email: SENDGRID_FROM,
+    name: "You have changed your password",
+  },
+  personalizations: [
+    {
+      to: [{ email: email }],
+
+      dynamic_template_data: {
+        email: email,
+      },
+    },
+  ],
+  template_id: TEMPLATE_ID_PASSWORD,
+};
+
+await sendEmail(verifyEmail);
+
+res.json({
+  success: true,
+  message: "Password reset succesfully!",
+});
+
 };
 
 export default {
@@ -297,5 +365,6 @@ export default {
   logout: ctrlWrapper(logout),
   updateUser: ctrlWrapper(updateUser),
   updateWaterRate: ctrlWrapper(updateWaterRate),
-  forgot_password: ctrlWrapper(forgot_password),
+  forgotPassword: ctrlWrapper(forgotPassword),
+  resetPassword: ctrlWrapper(resetPassword)
 };
