@@ -104,7 +104,7 @@ const login = async (req, res) => {
   const user = await findUser({ email });
 
   if (!user) {
-    throw HttpError(401, "Email or password is wrong!");
+    throw HttpError(401, "Email is wrong!");
   }
 
   if (!user.verify) {
@@ -223,8 +223,6 @@ const updateWaterRate = async (req, res) => {
   const { waterRate } = result;
   res.json({ waterRate });
 };
-
-const verifyUser = async (req, res) => { };
 
 export default {
   register: ctrlWrapper(register),
