@@ -12,6 +12,7 @@ import jwt from "jsonwebtoken";
 import Jimp from "jimp";
 import cloudinary from "../helpers/claudinary.js";
 import { unlink } from "fs/promises";
+// import gravatar from "gravatar";
 import { nanoid } from "nanoid";
 import sendEmail from "../helpers/sendEmail.js";
 
@@ -26,28 +27,36 @@ const register = async (req, res) => {
 
   const verificationToken = nanoid();
 
+  // const avatarURL = gravatar.url(email, {
+  //   protocol: "https",
+  //   s: "250",
+  //   r: "g",
+  //   d: "robohash",
+  // });
+
   const newUser = await authServices.signup({
     ...req.body,
+    // avatarURL,
     verificationToken,
   });
 
   const verifyEmail = {
+    
     from: {
       email: SENDGRID_FROM,
       name: "Water tracker",
     },
-    personalizations: [
-      {
-        to: [{ email: email }],
-
-        dynamic_template_data: {
-          email: email,
-          BASE_URL: BASE_URL,
-          verificationToken: verificationToken,
-        },
+    personalizations:[{
+      to: [{email:email}],
+      
+      dynamic_template_data: {
+        "email": email,
+        "BASE_URL": BASE_URL,
+        "verificationToken": verificationToken,
       },
-    ],
+    }],
     template_id: TEMPLATE_ID,
+    
   };
 
   await sendEmail(verifyEmail);
@@ -55,6 +64,7 @@ const register = async (req, res) => {
   res.status(201).json({
     user: {
       email: newUser.email,
+      // avatarURL: newUser.avatarURL,
     },
   });
 };
@@ -62,7 +72,7 @@ const register = async (req, res) => {
 const verify = async (req, res) => {
   const { verificationToken } = req.params;
   const user = await userServices.findUser({ verificationToken });
-
+ 
   if (!user) {
     throw HttpError(404, "User not found");
   }
@@ -72,7 +82,7 @@ const verify = async (req, res) => {
     { verify: true, verificationToken: "" }
   );
 
-  res.json({ message: "Verification successful" });
+  res.redirect('http://localhost:5173/capybara-components-frontend/signin');
 };
 
 const resendVerifyEmail = async (req, res) => {
@@ -87,15 +97,29 @@ const resendVerifyEmail = async (req, res) => {
   }
 
   const verifyEmail = {
-    to: email,
-    subject: "Verify email",
-    html: `<a target="_blank" style="background-color: #007bff; color: #fff; text-decoration: none; padding: 10px 20px; border-radius: 5px;" href="${BASE_URL}/users/verify/${user.verificationToken}">CLick to verify email</a>
-   `,
+    
+    from: {
+      email: SENDGRID_FROM,
+      name: "Water tracker",
+    },
+    personalizations:[{
+      to: [{email:email}],
+      
+      dynamic_template_data: {
+        "email": email,
+        "BASE_URL": BASE_URL,
+        "verificationToken": verificationToken,
+      },
+    }],
+    template_id: TEMPLATE_ID,
+    
   };
 
   await sendEmail(verifyEmail);
 
   res.json({ message: "Verification email sent" });
+  
+ 
 };
 
 const login = async (req, res) => {
