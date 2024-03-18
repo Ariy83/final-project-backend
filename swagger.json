@@ -11,7 +11,16 @@
   },
   "consumes": ["application/json", "multipart/form-data"],
   "produces": ["application/json"],
-  "servers": [{ "url": "https://final-project-backend-z26e.onrender.com/api" }],
+  "servers": [
+    {
+      "url": "https://final-project-backend-z26e.onrender.com/api",
+      "description": "Production server"
+    },
+    {
+      "url": "http://localhost:4000/api",
+      "description": "Development server"
+    }
+  ],
   "tags": [
     {
       "name": "Auth",
@@ -24,7 +33,6 @@
         "tags": ["Auth"],
         "summary": "User registration",
         "parameters": [],
-        "security": [{ "Bearer": [] }],
         "requestBody": {
           "description": "Registration's object",
           "required": true,
@@ -48,12 +56,164 @@
             }
           },
           "400": {
-            "description": "Bad request (invalid request body)",
-            "content": {}
+            "description": "Bad request (Invalid request body)"
           },
           "409": {
-            "description": "Conflict (email in use)",
-            "content": {}
+            "description": "Conflict (Email in use)"
+          }
+        }
+      }
+    },
+    "/users/login": {
+      "post": {
+        "tags": ["Auth"],
+        "summary": "User authentication",
+        "parameters": [],
+        "requestBody": {
+          "description": "Authentication's object",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegistrationRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthenticationResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request (Invalid request body)"
+          },
+          "401": {
+            "description": "Unauthorized (Email is wrong! || Email not verified! || Password is wrong! Try again!)"
+          }
+        }
+      }
+    },
+    "/users/logout": {
+      "post": {
+        "tags": ["Auth"],
+        "summary": "Logout",
+        "parameters": [],
+        "security": [{ "Bearer": [] }],
+        "responses": {
+          "204": {
+            "description": "You are logged out"
+          },
+          "401": {
+            "description": "Unauthorized (Not authorized)"
+          }
+        }
+      }
+    },
+    "/users/current": {
+      "get": {
+        "tags": ["Auth"],
+        "summary": "Get current user information",
+        "parameters": [],
+        "security": [{ "Bearer": [] }],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CurrentUserResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized (Not authorized)"
+          }
+        }
+      }
+    },
+    "/users/water-rate": {
+      "patch": {
+        "tags": ["Auth"],
+        "summary": "Change user's daily norma of water",
+        "parameters": [],
+        "security": [{ "Bearer": [] }],
+        "requestBody": {
+          "description": "waterRate object",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WaterRateRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WaterRateResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request (Invalid request body)"
+          },
+          "401": {
+            "description": "Unauthorized (Not authorized)"
+          }
+        }
+      }
+    },
+    "/users/update": {
+      "patch": {
+        "tags": ["Auth"],
+        "summary": "Update user",
+        "parameters": [],
+        "security": [{ "Bearer": [] }],
+        "requestBody": {
+          "description": "Update user object",
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateUserRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UpdateUserResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request (Invalid request body || .exe extension not allowed)"
+          },
+          "401": {
+            "description": "Unauthorized (Not authorized || Incorrect password!)"
+          },
+          "404": {
+            "description": "Not Found (User not found!)"
+          },
+          "409": {
+            "description": "Conflict (Email is already used)"
           }
         }
       }
@@ -78,26 +238,212 @@
         }
       },
       "RegistrationResponse": {
-        "type": "array",
+        "type": "object",
         "items": {
           "type": "object",
           "properties": {
-            "email": {
-              "type": "string",
-              "description": "User's email",
-              "format": "email"
-            },
-            "userId": {
-              "type": "number",
-              "description": "User's id",
-              "example": "32143232436545474"
+            "user": {
+              "email": {
+                "type": "string",
+                "description": "User's email",
+                "format": "email"
+              }
             }
           }
         },
-        "example": [
-          { "email": "1@gmail.com", "userId": "1" },
-          { "email": "2@gmail.com", "userId": "2" }
-        ]
+        "example": {
+          "user": {
+            "email": "user@example.com"
+          }
+        }
+      },
+      "AuthenticationResponse": {
+        "type": "object",
+        "items": {
+          "type": "object",
+          "properties": {
+            "token": {
+              "type": "string"
+            },
+            "user": {
+              "email": {
+                "type": "string",
+                "description": "User's email",
+                "format": "email"
+              },
+              "username": {
+                "type": "string",
+                "description": "User's name"
+              },
+              "gender": {
+                "type": "string",
+                "description": "User's gender"
+              },
+              "avatarURL": {
+                "type": "string",
+                "description": "User's avatar URL"
+              },
+              "waterRate": {
+                "type": "integer",
+                "description": "User's daily norma of water"
+              }
+            }
+          }
+        },
+        "example": {
+          "token": "eyJhbGciOiJIUzI1NiIsInR5c556IkpXVCJ9.eyJpZCI6I...",
+          "user": {
+            "email": "Capybara@example.com",
+            "username": "Capybara",
+            "gender": "man || woman",
+            "avatarURL": "https://en.wikipedia.org/wiki/Capybara#/media/File:Hydrochoeris_hydrochaeris_in_Brazil_in_Petr%C3%B3polis,_Rio_de_Janeiro,_Brazil_09.jpg",
+            "waterRate": "2000"
+          }
+        }
+      },
+      "CurrentUserResponse": {
+        "type": "object",
+        "items": {
+          "type": "object",
+          "properties": {
+            "user": {
+              "email": {
+                "type": "string",
+                "description": "User's email",
+                "format": "email"
+              },
+              "username": {
+                "type": "string",
+                "description": "User's name"
+              },
+              "gender": {
+                "type": "string",
+                "description": "User's gender"
+              },
+              "avatarURL": {
+                "type": "string",
+                "description": "User's avatar URL"
+              },
+              "waterRate": {
+                "type": "integer",
+                "description": "User's daily norma of water"
+              }
+            }
+          }
+        },
+        "example": {
+          "user": {
+            "email": "Capybara@example.com",
+            "username": "Capybara",
+            "gender": "man || woman",
+            "avatarURL": "https://en.wikipedia.org/wiki/Capybara#/media/File:Hydrochoeris_hydrochaeris_in_Brazil_in_Petr%C3%B3polis,_Rio_de_Janeiro,_Brazil_09.jpg",
+            "waterRate": "2000"
+          }
+        }
+      },
+      "WaterRateRequest": {
+        "type": "object",
+        "required": ["waterRate"],
+        "properties": {
+          "waterRate": {
+            "type": "integer",
+            "description": "User's daily norma of water",
+            "example": "1500"
+          }
+        }
+      },
+      "WaterRateResponse": {
+        "type": "object",
+        "items": {
+          "type": "object",
+          "properties": {
+            "waterRate": {
+              "type": "integer",
+              "description": "User's daily norma of water",
+              "example": "1500"
+            }
+          }
+        },
+        "example": {
+          "waterRate": "1500"
+        }
+      },
+      "UpdateUserRequest": {
+        "type": "object",
+        "required": ["email"],
+        "properties": {
+          "email": {
+            "type": "string",
+            "description": "User's email",
+            "format": "email"
+          },
+          "old_password": {
+            "type": "string",
+            "description": "User's old password",
+            "example": "qwerty123"
+          },
+          "new_password": {
+            "type": "string",
+            "description": "User's new password",
+            "example": "qwerty12345"
+          },
+          "username": {
+            "type": "string",
+            "description": "User's name"
+          },
+          "gender": {
+            "type": "string",
+            "description": "User's gender"
+          },
+          "avatarURL": {
+            "type": "string",
+            "description": "User's avatar URL",
+            "format": "binary"
+          }
+        },
+        "example": {
+          "email": "Capybara@example.com",
+          "old_password": "qwerty123",
+          "new_password": "qwerty12345",
+          "username": "Capybara",
+          "gender": "man || woman",
+          "avatarURL": "https://en.wikipedia.org/wiki/Capybara#/media/File:Hydrochoeris_hydrochaeris_in_Brazil_in_Petr%C3%B3polis,_Rio_de_Janeiro,_Brazil_09.jpg"
+        }
+      },
+      "UpdateUserResponse": {
+        "type": "object",
+        "items": {
+          "type": "object",
+          "properties": {
+            "user": {
+              "email": {
+                "type": "string",
+                "description": "User's email",
+                "format": "email"
+              },
+              "username": {
+                "type": "string",
+                "description": "User's name"
+              },
+              "gender": {
+                "type": "string",
+                "description": "User's gender"
+              },
+              "avatarURL": {
+                "type": "string",
+                "description": "User's avatar URL"
+              }
+            }
+          }
+        },
+        "example": {
+          "user": {
+            "email": "Capybara@example.com",
+            "username": "Capybara",
+            "gender": "man || woman",
+            "avatarURL": "https://en.wikipedia.org/wiki/Capybara#/media/File:Hydrochoeris_hydrochaeris_in_Brazil_in_Petr%C3%B3polis,_Rio_de_Janeiro,_Brazil_09.jpg"
+          }
+        }
       }
     },
     "securitySchemes": {

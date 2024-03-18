@@ -30,9 +30,19 @@ authRouter.post("/logout", authenticate, authControllers.logout);
 
 authRouter.get("/current", authenticate, authControllers.getCurrent);
 
-authRouter.patch("/update", authenticate, upload.single("avatarURL"), authControllers.updateUser);
+authRouter.patch(
+  "/update",
+  authenticate,
+  upload.single("avatarURL"),
+  authControllers.updateUser
+);
 
-authRouter.patch("/water-rate", authenticate, validateBody(waterRateChangeSchema), authControllers.updateWaterRate)
+authRouter.patch(
+  "/water-rate",
+  authenticate,
+  validateBody(waterRateChangeSchema),
+  authControllers.updateWaterRate
+);
 
 authRouter.post("/forgot-password", validateBody(forgotPassword), authControllers.forgotPassword)
 
