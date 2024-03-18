@@ -63,7 +63,7 @@ const register = async (req, res) => {
 
   res.status(201).json({
     user: {
-      email: newUser.email,
+      email: newUser.email
       // avatarURL: newUser.avatarURL,
     },
   });
@@ -82,7 +82,7 @@ const verify = async (req, res) => {
     { verify: true, verificationToken: "" }
   );
 
-  res.redirect('http://localhost:5173/capybara-components-frontend/signin');
+  res.redirect('http://localhost:5173/capybara-components-frontend/signin?message=Verification%20successful');
 };
 
 const resendVerifyEmail = async (req, res) => {
