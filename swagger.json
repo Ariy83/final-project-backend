@@ -211,9 +211,6 @@
           },
           "404": {
             "description": "Not Found (User not found!)"
-          },
-          "409": {
-            "description": "Conflict (Email is already used)"
           }
         }
       }
