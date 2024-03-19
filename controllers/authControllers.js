@@ -195,11 +195,6 @@ const updateUser = async (req, res) => {
     changedData.password = await bcrypt.hash(new_password, 8);
   }
 
-  // const user = await userServices.findUser({ email });
-  // if (user) {
-  //   throw HttpError(409, "Email is already used");
-  // }
-
   if (req.file) {
     const { path: filePath } = req.file;
     Jimp.read(filePath)
