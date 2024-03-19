@@ -327,7 +327,7 @@ if(password.trim().length < 8 || password.trim().length > 64){
   throw HttpError (401, "Password must be 8 to 64 characters long!")
 }
 
-user.password = password.trim()
+user.password = await bcrypt.hash(password, 8);
 await user.save()
 
 await ResetToken.findOneAndDelete({owner: user._id})

@@ -46,6 +46,6 @@ authRouter.patch(
 
 authRouter.post("/forgot-password", validateBody(forgotPassword), authControllers.forgotPassword)
 
-authRouter.post("/reset-password", isResetTokenValid, authControllers.resetPassword)
+authRouter.post("/reset-password/", isResetTokenValid, authControllers.resetPassword)
 
 export default authRouter;
