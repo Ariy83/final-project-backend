@@ -13,3 +13,7 @@ export const waterRateChangeSchema = Joi.object({
 export const verifySchema = Joi.object({
   email: Joi.string().pattern(emailRegexp).required(),
 });
+
+export const forgotPassword = Joi.object({
+  email: Joi.string().pattern(emailRegexp).required(),
+});

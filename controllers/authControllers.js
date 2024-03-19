@@ -12,10 +12,20 @@ import jwt from "jsonwebtoken";
 import Jimp from "jimp";
 import cloudinary from "../helpers/claudinary.js";
 import { unlink } from "fs/promises";
+// import gravatar from "gravatar";
 import { nanoid } from "nanoid";
 import sendEmail from "../helpers/sendEmail.js";
+import resetTokenSchema from "../models/ResetToken.js";
+import ResetToken from "../models/ResetToken.js";
+import User from "../models/User.js";
 
-const { JWT_SECRET, BASE_URL, TEMPLATE_ID, SENDGRID_FROM } = process.env;
+const {
+  JWT_SECRET,
+  BASE_URL,
+  TEMPLATE_ID,
+  SENDGRID_FROM,
+  TEMPLATE_ID_PASSWORD,
+} = process.env;
 
 const register = async (req, res) => {
   const { email } = req.body;
@@ -26,8 +36,16 @@ const register = async (req, res) => {
 
   const verificationToken = nanoid();
 
+  // const avatarURL = gravatar.url(email, {
+  //   protocol: "https",
+  //   s: "250",
+  //   r: "g",
+  //   d: "robohash",
+  // });
+
   const newUser = await authServices.signup({
     ...req.body,
+    // avatarURL,
     verificationToken,
   });
 
@@ -55,6 +73,7 @@ const register = async (req, res) => {
   res.status(201).json({
     user: {
       email: newUser.email,
+      // avatarURL: newUser.avatarURL,
     },
   });
 };
@@ -72,7 +91,9 @@ const verify = async (req, res) => {
     { verify: true, verificationToken: "" }
   );
 
-  res.json({ message: "Verification successful" });
+  res.redirect(
+    "http://localhost:5173/capybara-components-frontend/signin?message=Verification%20successful"
+  );
 };
 
 const resendVerifyEmail = async (req, res) => {
@@ -87,10 +108,22 @@ const resendVerifyEmail = async (req, res) => {
   }
 
   const verifyEmail = {
-    to: email,
-    subject: "Verify email",
-    html: `<a target="_blank" style="background-color: #007bff; color: #fff; text-decoration: none; padding: 10px 20px; border-radius: 5px;" href="${BASE_URL}/users/verify/${user.verificationToken}">CLick to verify email</a>
-   `,
+    from: {
+      email: SENDGRID_FROM,
+      name: "Water tracker",
+    },
+    personalizations: [
+      {
+        to: [{ email: email }],
+
+        dynamic_template_data: {
+          email: email,
+          BASE_URL: BASE_URL,
+          verificationToken: verificationToken,
+        },
+      },
+    ],
+    template_id: TEMPLATE_ID,
   };
 
   await sendEmail(verifyEmail);
@@ -220,8 +253,109 @@ const updateUser = async (req, res) => {
 const updateWaterRate = async (req, res) => {
   const { _id } = req.user;
   const result = await updateWater(_id, req.body);
-  const { waterRate } = result;
-  res.json({ waterRate });
+  // console.log(result)
+  res.json(result);
+};
+
+
+
+const forgotPassword = async (req, res) => {
+  const { email } = req.body;
+  if (!email) {
+    throw HttpError(404, "Please provide the valid email!");
+  }
+  const user = await userServices.findUser({ email });
+  if (!user) {
+    throw HttpError(404, "User not found!");
+  }
+
+  const token = await ResetToken.findOne({ owner: user._id });
+  if (token) {
+    throw HttpError(
+      404,
+      "Only after one hour you can reques for new password!"
+    );
+  }
+
+  const resetToken = new ResetToken({ owner: user._id, token: nanoid() });
+  await resetToken.save();
+
+  const verifyEmail = {
+    from: {
+      email: SENDGRID_FROM,
+      name: "Forgot password",
+    },
+    personalizations: [
+      {
+        to: [{ email: email }],
+
+        dynamic_template_data: {
+          email: email,
+          id: user._id.toString(),
+          BASE_URL: BASE_URL,
+          token: resetToken.token,
+        },
+      },
+    ],
+    template_id: TEMPLATE_ID_PASSWORD,
+  };
+
+  await sendEmail(verifyEmail);
+
+  res.json({
+    success: true,
+    message: "Password reset link is sent to your email!",
+  });
+};
+
+
+
+const resetPassword = async (req, res) => {
+  const { password, email } = req.body;
+
+  const user = await User.findById(req.user._id)
+ if(!user) {
+  throw HttpError (404, "User not found!")
+ }
+
+
+if(user.password === password) {
+  throw HttpError (409, "Password must be different!")
+ }
+
+if(password.trim().length < 8 || password.trim().length > 64){
+  throw HttpError (401, "Password must be 8 to 64 characters long!")
+}
+
+user.password = await bcrypt.hash(password, 8);
+await user.save()
+
+await ResetToken.findOneAndDelete({owner: user._id})
+
+const verifyEmail = {
+  from: {
+    email: SENDGRID_FROM,
+    name: "You have changed your password",
+  },
+  personalizations: [
+    {
+      to: [{ email: email }],
+
+      dynamic_template_data: {
+        email: email,
+      },
+    },
+  ],
+  template_id: TEMPLATE_ID_PASSWORD,
+};
+
+await sendEmail(verifyEmail);
+
+res.json({
+  success: true,
+  message: "Password reset succesfully!",
+});
+
 };
 
 export default {
@@ -233,4 +367,6 @@ export default {
   logout: ctrlWrapper(logout),
   updateUser: ctrlWrapper(updateUser),
   updateWaterRate: ctrlWrapper(updateWaterRate),
+  forgotPassword: ctrlWrapper(forgotPassword),
+  resetPassword: ctrlWrapper(resetPassword)
 };
