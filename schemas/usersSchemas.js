@@ -7,7 +7,7 @@ export const signupSchema = Joi.object({
 });
 
 export const waterRateChangeSchema = Joi.object({
-  waterRate: Joi.string().required(),
+  waterRate: Joi.number().required(),
 });
 
 export const verifySchema = Joi.object({
