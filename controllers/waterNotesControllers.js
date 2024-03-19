@@ -1,78 +1,67 @@
 import {
-  getWaterNotesByFilter,
-  getOneWaterNoteByFilter,
-  removeWaterNoteByFilter,
-  addWaterNote,
-  editWaterNoteByFilter,
-  updateWaterNoteStatusByFilter,
+  addWaterService,
+  updateWaterService,
+  deleteWaterService,
+  getWaterConsumptionDaySummary,
+  getWaterConsumptionMonthSummary,
 } from "../services/waterNotesServices.js";
-import HttpError from "../helpers/HttpError.js";
+
 import ctrlWrapper from "../decorators/ctrlWrapper.js";
+import HttpError from "../helpers/HttpError.js";
 
-const getAllWaterNotes = async (req, res) => {
+export async function addAllWaterNotes(req, res) {
   const { _id: owner } = req.user;
-  const result = await getWaterNotesByFilter({ owner });
-  res.json({ result });
-};
 
-const getOneWaterNote = async (req, res) => {
+  const newWaterNote = await addWaterService({ ...req.body, owner });
+  res.status(201).json(newWaterNote);
+}
+
+export async function updateWaterNote(req, res) {
   const { id } = req.params;
   const { _id: owner } = req.user;
-  const result = await getOneWaterNoteByFilter({ _id: id, owner });
-  if (!result) {
-    throw HttpError(404);
-  }
-  res.json(result);
-};
 
-const deleteWaterNote = async (req, res) => {
+  const updatedWaterById = await updateWaterService(id, owner, req.body);
+  if (!updatedWaterById) {
+    throw HttpError(404, "Not Found");
+  }
+  res.status(200).json(updatedWaterById);
+}
+
+export async function deleteWaterNote(req, res) {
   const { id } = req.params;
   const { _id: owner } = req.user;
-  const result = await removeWaterNoteByFilter({ _id: id, owner });
-  if (!result) {
-    throw HttpError(404);
+  const deletedWater = await deleteWaterService(id, owner);
+  if (!deletedWater) {
+    throw HttpError(404, "Not found");
   }
-  res.json(result);
-};
+  res.status(200).json({ massage: "Water deleted" });
+}
 
-const createWaterNote = async (req, res) => {
+export async function getTodayWaterNote(req, res) {
   const { _id: owner } = req.user;
-
-  const result = await addWaterNote({ ...req.body, owner });
-  res.status(201).json(result);
-};
-
-const updateWaterNote = async (req, res) => {
-  if (Object.keys(req.body).length === 0) {
-    throw HttpError(400, "Body must have at least one field");
-  }
-  const { id } = req.params;
-  const { _id: owner } = req.user;
-  const result = await editWaterNoteByFilter({ _id: id, owner }, req.body);
-  if (!result) {
-    throw HttpError(404);
-  }
-  res.json(result);
-};
-
-const updateStatusWaterNote = async (req, res) => {
-  const { WaterNoteId } = req.params;
-  const { _id: owner } = req.user;
-  const result = await updateWaterNoteStatusByFilter(
-    { _id: WaterNoteId, owner },
-    req.body
+  const { date } = req.query;
+  const waterConsumptionArray = await getWaterConsumptionDaySummary(
+    owner,
+    date
   );
-  if (!result) {
-    throw HttpError(404);
-  }
-  res.json(result);
-};
+  res.status(200).json(waterConsumptionArray[0]);
+}
+export async function monthInfoWaterNote(req, res) {
+  const { _id: owner } = req.user;
+  const { year, month } = req.query;
+
+  const waterConsumptionMonth = await getWaterConsumptionMonthSummary(
+    owner,
+    year,
+    month
+  );
+  res.status(200).json(waterConsumptionMonth);
+}
 
 export default {
-  getAllWaterNotes: ctrlWrapper(getAllWaterNotes),
-  getOneWaterNote: ctrlWrapper(getOneWaterNote),
-  deleteWaterNote: ctrlWrapper(deleteWaterNote),
-  createWaterNote: ctrlWrapper(createWaterNote),
+  addAllWaterNotes: ctrlWrapper(addAllWaterNotes),
   updateWaterNote: ctrlWrapper(updateWaterNote),
-  updateStatusWaterNote: ctrlWrapper(updateStatusWaterNote),
+  deleteWaterNote: ctrlWrapper(deleteWaterNote),
+  getTodayWaterNote: ctrlWrapper(getTodayWaterNote),
+  monthInfoWaterNote: ctrlWrapper(monthInfoWaterNote),
 };

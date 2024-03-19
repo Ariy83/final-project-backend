@@ -18,7 +18,7 @@ app.use(express.json());
 
 app.use("/api/users", authRouter);
 
-app.use("/api/water-notes", waterNotesRouter);
+app.use("/api/water", waterNotesRouter);
 
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
@@ -31,7 +31,7 @@ app.use((err, req, res, next) => {
   res.status(status).json({ message });
 });
 
-const { DB_HOST, PORT } = process.env;
+const { DB_HOST, PORT=3000 } = process.env;
 
 mongoose
   .connect(DB_HOST)
