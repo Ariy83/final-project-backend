@@ -48,4 +48,5 @@ authRouter.post("/forgot-password", validateBody(forgotPassword), authController
 
 authRouter.post("/reset-password/", isResetTokenValid, authControllers.resetPassword)
 
+authRouter.post("/reset-password/:token/:id", isResetTokenValid, authControllers.resetPassword)
 export default authRouter;

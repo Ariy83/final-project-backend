@@ -92,7 +92,7 @@ const verify = async (req, res) => {
   );
 
   res.redirect(
-    "http://localhost:5173/capybara-components-frontend/signin?message=Verification%20successful"
+    "https://julika-gulchitai.github.io/capybara-components-frontend/signin?message=Verification%20successful"
   );
 };
 
@@ -311,9 +311,10 @@ const forgotPassword = async (req, res) => {
 
 
 const resetPassword = async (req, res) => {
-  const { password, email } = req.body;
-
+  const { password, email } = req.user;
+console.log(req.user)
   const user = await User.findById(req.user._id)
+  console.log(user)
  if(!user) {
   throw HttpError (404, "User not found!")
  }
