@@ -296,7 +296,7 @@
             "email": "Capybara@example.com",
             "username": "Capybara",
             "gender": "male || female",
-            "avatarURL": "https://en.wikipedia.org/wiki/Capybara#/media/File:Hydrochoeris_hydrochaeris_in_Brazil_in_Petr%C3%B3polis,_Rio_de_Janeiro,_Brazil_09.jpg",
+            "avatarURL": "http://res.cloudinary.com/dooyixxpr/image/upload/v1710857369/avatars/lsxy0ihfqefuywlg9b0o.png",
             "waterRate": "2000"
           }
         }
@@ -336,7 +336,7 @@
             "email": "Capybara@example.com",
             "username": "Capybara",
             "gender": "male || female",
-            "avatarURL": "https://en.wikipedia.org/wiki/Capybara#/media/File:Hydrochoeris_hydrochaeris_in_Brazil_in_Petr%C3%B3polis,_Rio_de_Janeiro,_Brazil_09.jpg",
+            "avatarURL": "http://res.cloudinary.com/dooyixxpr/image/upload/v1710857369/avatars/lsxy0ihfqefuywlg9b0o.png",
             "waterRate": "2000"
           }
         }
@@ -371,6 +371,11 @@
       "UpdateUserRequest": {
         "type": "object",
         "properties": {
+          "email": {
+            "type": "string",
+            "description": "User's email",
+            "format": "email"
+          },
           "old_password": {
             "type": "string",
             "description": "User's old password"
@@ -398,7 +403,7 @@
           "new_password": "qwerty12345",
           "username": "Capybara",
           "gender": "male || female",
-          "avatarURL": "https://en.wikipedia.org/wiki/Capybara#/media/File:Hydrochoeris_hydrochaeris_in_Brazil_in_Petr%C3%B3polis,_Rio_de_Janeiro,_Brazil_09.jpg"
+          "avatarURL": "http://res.cloudinary.com/dooyixxpr/image/upload/v1710857369/avatars/lsxy0ihfqefuywlg9b0o.png"
         }
       },
       "UpdateUserResponse": {
@@ -418,7 +423,8 @@
               },
               "gender": {
                 "type": "string",
-                "description": "User's gender"
+                "description": "User's gender",
+                "example": "male"
               },
               "avatarURL": {
                 "type": "string",
@@ -432,7 +438,7 @@
             "email": "Capybara@example.com",
             "username": "Capybara",
             "gender": "male || female",
-            "avatarURL": "https://en.wikipedia.org/wiki/Capybara#/media/File:Hydrochoeris_hydrochaeris_in_Brazil_in_Petr%C3%B3polis,_Rio_de_Janeiro,_Brazil_09.jpg"
+            "avatarURL": "http://res.cloudinary.com/dooyixxpr/image/upload/v1710857369/avatars/lsxy0ihfqefuywlg9b0o.png"
           }
         }
       }

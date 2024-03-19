@@ -3,10 +3,8 @@ import morgan from "morgan";
 import cors from "cors";
 import mongoose from "mongoose";
 import "dotenv/config";
-
 import authRouter from "./routes/authRouter.js";
 import waterNotesRouter from "./routes/waterNotesRouter.js";
-
 import swaggerUi from "swagger-ui-express";
 import swaggerDocument from "./swagger.json" with { type: "json" };
 

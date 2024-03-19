@@ -1,18 +1,16 @@
 import express from "express";
 import validateBody from "../decorators/validateBody.js";
 import authControllers from "../controllers/authControllers.js";
-import { signupSchema, waterRateChangeSchema, verifySchema, forgotPassword } from "../schemas/usersSchemas.js";
+import usersSchemas from "../schemas/usersSchemas.js";
 import authenticate from "../middlewares/authenticate.js";
-import upload from '../middlewares/upload.js';
+import upload from "../middlewares/upload.js";
 import isResetTokenValid from "../middlewares/isResetTokenValid.js";
-// import upload from "../middlewares/upload.js";
 
 const authRouter = express.Router();
 
 authRouter.post(
   "/register",
-  // upload.single("avatarURL"),
-  validateBody(signupSchema),
+  validateBody(usersSchemas.signupSchema),
   authControllers.register
 );
 
@@ -20,11 +18,15 @@ authRouter.get("/verify/:verificationToken", authControllers.verify);
 
 authRouter.post(
   "/verify",
-  validateBody(verifySchema),
+  validateBody(usersSchemas.verifySchema),
   authControllers.resendVerifyEmail
 );
 
-authRouter.post("/login", validateBody(signupSchema), authControllers.login);
+authRouter.post(
+  "/login",
+  validateBody(usersSchemas.signupSchema),
+  authControllers.login
+);
 
 authRouter.post("/logout", authenticate, authControllers.logout);
 
@@ -40,13 +42,25 @@ authRouter.patch(
 authRouter.patch(
   "/water-rate",
   authenticate,
-  validateBody(waterRateChangeSchema),
+  validateBody(usersSchemas.waterRateChangeSchema),
   authControllers.updateWaterRate
 );
 
-authRouter.post("/forgot-password", validateBody(forgotPassword), authControllers.forgotPassword)
+authRouter.post(
+  "/forgot-password",
+  validateBody(usersSchemas.forgotPassword),
+  authControllers.forgotPassword
+);
 
-authRouter.post("/reset-password/", isResetTokenValid, authControllers.resetPassword)
+authRouter.post(
+  "/reset-password/",
+  isResetTokenValid,
+  authControllers.resetPassword
+);
 
-authRouter.post("/reset-password/:token/:id", isResetTokenValid, authControllers.resetPassword)
+authRouter.post(
+  "/reset-password/:token/:id",
+  isResetTokenValid,
+  authControllers.resetPassword
+);
 export default authRouter;

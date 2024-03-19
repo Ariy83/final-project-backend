@@ -1,10 +1,6 @@
-import * as authServices from "../services/authServices.js";
-import * as userServices from "../services/userServices.js";
-import {
-  findUser,
-  findUserById,
-  updateWater,
-} from "../services/userServices.js";
+import User from "../models/User.js";
+import authServices from "../services/authServices.js";
+import userServices from "../services/userServices.js";
 import HttpError from "../helpers/HttpError.js";
 import ctrlWrapper from "../decorators/ctrlWrapper.js";
 import bcrypt from "bcrypt";
@@ -12,12 +8,9 @@ import jwt from "jsonwebtoken";
 import Jimp from "jimp";
 import cloudinary from "../helpers/claudinary.js";
 import { unlink } from "fs/promises";
-// import gravatar from "gravatar";
 import { nanoid } from "nanoid";
 import sendEmail from "../helpers/sendEmail.js";
-import resetTokenSchema from "../models/ResetToken.js";
 import ResetToken from "../models/ResetToken.js";
-import User from "../models/User.js";
 
 const {
   JWT_SECRET,
@@ -29,23 +22,15 @@ const {
 
 const register = async (req, res) => {
   const { email } = req.body;
-  const user = await findUser({ email });
+  const user = await userServices.findUser({ email });
   if (user) {
     throw HttpError(409, "Email in use");
   }
 
   const verificationToken = nanoid();
 
-  // const avatarURL = gravatar.url(email, {
-  //   protocol: "https",
-  //   s: "250",
-  //   r: "g",
-  //   d: "robohash",
-  // });
-
   const newUser = await authServices.signup({
     ...req.body,
-    // avatarURL,
     verificationToken,
   });
 
@@ -73,7 +58,6 @@ const register = async (req, res) => {
   res.status(201).json({
     user: {
       email: newUser.email,
-      // avatarURL: newUser.avatarURL,
     },
   });
 };
@@ -134,7 +118,7 @@ const resendVerifyEmail = async (req, res) => {
 const login = async (req, res) => {
   const { email, password } = req.body;
 
-  const user = await findUser({ email });
+  const user = await userServices.findUser({ email });
 
   if (!user) {
     throw HttpError(401, "Email is wrong!");
@@ -153,7 +137,7 @@ const login = async (req, res) => {
     id: user._id,
   };
 
-  const token = jwt.sign(payload, JWT_SECRET, { expiresIn: "24h" });
+  const token = jwt.sign(payload, JWT_SECRET, { expiresIn: "30d" });
 
   await authServices.setToken(user._id, token);
 
@@ -198,7 +182,7 @@ const updateUser = async (req, res) => {
   const changedData = { ...req.body };
 
   if (old_password && new_password) {
-    const user = await findUserById(owner);
+    const user = await userServices.findUserById(owner);
     if (!user) {
       throw HttpError(404, "User not found!");
     }
@@ -211,10 +195,10 @@ const updateUser = async (req, res) => {
     changedData.password = await bcrypt.hash(new_password, 8);
   }
 
-  const user = await findUser({ email });
-  if (user) {
-    throw HttpError(409, "Email is already used");
-  }
+  // const user = await userServices.findUser({ email });
+  // if (user) {
+  //   throw HttpError(409, "Email is already used");
+  // }
 
   if (req.file) {
     const { path: filePath } = req.file;
@@ -252,12 +236,10 @@ const updateUser = async (req, res) => {
 
 const updateWaterRate = async (req, res) => {
   const { _id } = req.user;
-  const result = await updateWater(_id, req.body);
-  // console.log(result)
-  res.json(result);
+  const result = await userServices.updateWater(_id, req.body);
+  const { waterRate } = result;
+  res.json({ waterRate });
 };
-
-
 
 const forgotPassword = async (req, res) => {
   const { email } = req.body;
@@ -308,55 +290,49 @@ const forgotPassword = async (req, res) => {
   });
 };
 
-
-
 const resetPassword = async (req, res) => {
   const { password, email } = req.user;
-console.log(req.user)
-  const user = await User.findById(req.user._id)
-  console.log(user)
- if(!user) {
-  throw HttpError (404, "User not found!")
- }
+  const user = await User.findById(req.user._id);
+  if (!user) {
+    throw HttpError(404, "User not found!");
+  }
 
+  if (user.password === password) {
+    throw HttpError(409, "Password must be different!");
+  }
 
-if(user.password === password) {
-  throw HttpError (409, "Password must be different!")
- }
+  if (password.trim().length < 8 || password.trim().length > 64) {
+    throw HttpError(401, "Password must be 8 to 64 characters long!");
+  }
 
-if(password.trim().length < 8 || password.trim().length > 64){
-  throw HttpError (401, "Password must be 8 to 64 characters long!")
-}
+  user.password = await bcrypt.hash(password, 8);
+  await user.save();
 
-user.password = await bcrypt.hash(password, 8);
-await user.save()
+  await ResetToken.findOneAndDelete({ owner: user._id });
 
-await ResetToken.findOneAndDelete({owner: user._id})
-
-const verifyEmail = {
-  from: {
-    email: SENDGRID_FROM,
-    name: "You have changed your password",
-  },
-  personalizations: [
-    {
-      to: [{ email: email }],
-
-      dynamic_template_data: {
-        email: email,
-      },
+  const verifyEmail = {
+    from: {
+      email: SENDGRID_FROM,
+      name: "You have changed your password",
     },
-  ],
-  template_id: TEMPLATE_ID_PASSWORD,
-};
+    personalizations: [
+      {
+        to: [{ email: email }],
 
-await sendEmail(verifyEmail);
+        dynamic_template_data: {
+          email: email,
+        },
+      },
+    ],
+    template_id: TEMPLATE_ID_PASSWORD,
+  };
 
-res.json({
-  success: true,
-  message: "Password reset succesfully!",
-});
+  await sendEmail(verifyEmail);
 
+  res.json({
+    success: true,
+    message: "Password reset succesfully!",
+  });
 };
 
 export default {
@@ -369,5 +345,5 @@ export default {
   updateUser: ctrlWrapper(updateUser),
   updateWaterRate: ctrlWrapper(updateWaterRate),
   forgotPassword: ctrlWrapper(forgotPassword),
-  resetPassword: ctrlWrapper(resetPassword)
+  resetPassword: ctrlWrapper(resetPassword),
 };
