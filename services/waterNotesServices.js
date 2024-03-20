@@ -97,7 +97,7 @@ export async function getWaterConsumptionMonthSummary(owner, year, month) {
   const firstDayOfMonth = new Date(year, month - 1, 1);
   const lastDayOfMonth = new Date(year, month, 0, 23, 59, 59, 999);
 
-  const waterConsumptionArray = await WaterNote.aggregate([
+  const waterConsumptionArray = await Water.aggregate([
     {
       $group: {
         _id: { $dateToString: { format: "%Y-%m-%d", date: "$date" } },
