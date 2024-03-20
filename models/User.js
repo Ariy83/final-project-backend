@@ -49,6 +49,16 @@ const userSchema = new Schema(
       type: String,
       default: null,
     },
+    language: {
+      type: String,
+      enum: ['uk', 'en'],
+      default: 'en',
+    },
+    theme: {
+      type: String,
+      enum: ['light', 'dark'],
+      default: 'light',
+    }
   },
   { versionKey: false, timestamps: true }
 );

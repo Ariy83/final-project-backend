@@ -150,12 +150,14 @@ const login = async (req, res) => {
       gender: user.gender,
       avatarURL: user.avatarURL,
       waterRate: user.waterRate,
+      language: user.language,
+      theme: user.theme,
     },
   });
 };
 
 const getCurrent = (req, res) => {
-  const { email, username, gender, avatarURL, waterRate } = req.user;
+  const { email, username, gender, avatarURL, waterRate, language, theme } = req.user;
 
   res.json({
     user: {
@@ -164,6 +166,8 @@ const getCurrent = (req, res) => {
       gender,
       avatarURL,
       waterRate,
+      language,
+      theme
     },
   });
 };
@@ -230,7 +234,10 @@ const updateUser = async (req, res) => {
       email: newUser.email,
       username: newUser.username,
       gender: newUser.gender,
-      avatarURL: newUser.avatarURL
+      avatarURL: newUser.avatarURL,
+      language: newUser.language,
+      theme: newUser.theme,
+      waterRate: newUser.waterRate,
     }
   });
 };
