@@ -33,7 +33,7 @@ export async function deleteWaterService(id, owner) {
 export async function getWaterConsumptionDaySummary(owner, date) {
   const user = await User.findById(owner);
   if (!user) throw HttpError(404, "User not found");
-  const dailyNormAmount = user.dailyNorma;
+  const dailyNormAmount = user.waterRate;
 
   let waterConsumptionArray = await Water.aggregate([
     {
@@ -93,7 +93,7 @@ export async function getWaterConsumptionMonthSummary(owner, year, month) {
   const user = await User.findById(owner);
   if (!user) throw HttpError(404, "User not found");
 
-  const dailyNormAmount = user.dailyNorma;
+  const dailyNormAmount = user.waterRate;
   const firstDayOfMonth = new Date(year, month - 1, 1);
   const lastDayOfMonth = new Date(year, month, 0, 23, 59, 59, 999);
 
@@ -115,10 +115,7 @@ export async function getWaterConsumptionMonthSummary(owner, year, month) {
       $addFields: {
         waterVolumePercentage: {
           $round: {
-            $multiply: [
-              { $divide: ["$waterVolumeSum", dailyNormAmount * 1000] },
-              100,
-            ],
+            $multiply: [{ $divide: ["$waterVolumeSum", dailyNormAmount] }, 100],
           },
         },
       },
