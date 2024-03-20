@@ -2,7 +2,6 @@ import express from "express";
 import authenticate from "../middlewares/authenticate.js";
 import validateBody from "../decorators/validateBody.js";
 import isValidId from "../middlewares/isValidId.js";
-import validateQuery from "../middlewares/queryValidation.js";
 import {
   addAllWaterNotes,
   updateWaterNote,
@@ -10,7 +9,8 @@ import {
   getTodayWaterNote,
   monthInfoWaterNote,
 } from "../controllers/waterNotesControllers.js";
-import todayDatevalidation from "../helpers/todayDatevalidation.js";
+import waterSchemas from "../schemas/waterNotesSchemas.js";
+import validateQuery from "../middlewares/queryValidation.js";
 
 const waterNotesRouter = express.Router();
 
@@ -18,24 +18,28 @@ waterNotesRouter.use(authenticate);
 
 waterNotesRouter.get(
   "/month",
-  validateQuery(todayDatevalidation),
+  validateQuery(waterSchemas.todayDatevalidation),
   monthInfoWaterNote
 );
 
 waterNotesRouter.get(
   "/today",
-  validateQuery(todayDatevalidation),
+  validateQuery(waterSchemas.validateInput),
   getTodayWaterNote
 );
 
 waterNotesRouter.delete("/id", isValidId.forId, deleteWaterNote);
 
-waterNotesRouter.post("/", validateBody(validateBody), addAllWaterNotes);
+waterNotesRouter.post(
+  "/",
+  validateBody(waterSchemas.bodyValidation),
+  addAllWaterNotes
+);
 
 waterNotesRouter.put(
   "/update/:Id",
   isValidId.forId,
-  validateBody(validateBody),
+  validateBody(waterSchemas.bodyValidation),
   updateWaterNote
 );
 

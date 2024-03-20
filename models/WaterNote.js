@@ -23,6 +23,6 @@ const waterNoteSchema = new Schema(
 );
 waterNoteSchema.post("save", handleSaveError);
 
-const Water = model("water", waterNoteSchema);
+const Water = model("water-note", waterNoteSchema);
 
 export default Water;
