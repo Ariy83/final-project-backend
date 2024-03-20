@@ -31,7 +31,7 @@ export async function deleteWaterService(id, owner) {
 }
 
 export async function getWaterConsumptionDaySummary(owner, date) {
-  const user = await User.findById(owner);
+  const user = await userServices.findUserById(owner);
   if (!user) throw HttpError(404, "User not found");
   const dailyNormAmount = user.waterRate;
 
@@ -90,7 +90,7 @@ export async function getWaterConsumptionDaySummary(owner, date) {
 }
 
 export async function getWaterConsumptionMonthSummary(owner, year, month) {
-  const user = await User.findById(owner);
+  const user = await userServices.findUserById(owner);
   if (!user) throw HttpError(404, "User not found");
 
   const dailyNormAmount = user.waterRate;
