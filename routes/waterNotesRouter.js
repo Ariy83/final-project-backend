@@ -18,13 +18,13 @@ waterNotesRouter.use(authenticate);
 
 waterNotesRouter.get(
   "/month",
-  validateQuery(waterSchemas.todayDatevalidation),
+  validateQuery(waterSchemas.validateInput),
   monthInfoWaterNote
 );
 
 waterNotesRouter.get(
   "/today",
-  validateQuery(waterSchemas.validateInput),
+  validateQuery(waterSchemas.todayDatevalidation),
   getTodayWaterNote
 );
 
