@@ -18,4 +18,13 @@ const forContactId = (req, res, next) => {
   next();
 };
 
-export default { forId, forContactId };
+const isValidId = (req, res, next) => {
+  const { id } = req.params;
+  if (!isValidObjectId(id)) {
+    next(httpError(400, `${id} is not valid id`));
+    return;
+  }
+  next();
+};
+
+export default { forId, forContactId, isValidId };

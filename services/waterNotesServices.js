@@ -1,11 +1,11 @@
 import Water from "../models/WaterNote.js";
 import User from "../models/User.js";
-import formatDate from "../helpers/formatDate.js";
+import dateFormat from "../helpers/formatDate.js";
 import HttpError from "../helpers/HttpError.js";
 
 export async function addWaterService(body) {
   const { date } = body;
-  const currentDate = formatDateForEndpoins(date);
+  const currentDate = dateFormat.formatDateForEndpoins(date);
 
   const newWaterNote = await Water.create({ ...body, date: currentDate });
   return newWaterNote;
@@ -13,7 +13,7 @@ export async function addWaterService(body) {
 
 export async function updateWaterService(id, owner, body) {
   const { date } = body;
-  const currentDate = formatDateForEndpoins(date);
+  const currentDate = dateFormat.formatDateForEndpoins(date);
 
   const updatedNote = await Water.findOneAndUpdate(
     { _id: id, owner },
@@ -140,7 +140,7 @@ export async function getWaterConsumptionMonthSummary(owner, year, month) {
   const waterObjectresult = waterConsumptionArray.reduce((acc, item) => {
     const portions = item.waterVolumes.length;
     acc[item.date] = {
-      date: formatDate(item.date),
+      date: dateFormat.formatDate(item.date),
       portions: portions,
       waterVolumePercentage: item.waterVolumePercentage,
       dailyNorma: dailyNormAmount,
