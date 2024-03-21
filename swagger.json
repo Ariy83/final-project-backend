@@ -256,7 +256,7 @@
         }
       }
     },
-    "/water/:id": {
+    "/water/{id}": {
       "put": {
         "tags": ["Water-notes"],
         "summary": "Edit water-note",
