@@ -10,21 +10,4 @@ const forId = (req, res, next) => {
   next();
 };
 
-const forContactId = (req, res, next) => {
-  const { contactId } = req.params;
-  if (!isValidObjectId(contactId)) {
-    return next(HttpError(404, `${contactId} is not valid contactId`));
-  }
-  next();
-};
-
-const isValidId = (req, res, next) => {
-  const { id } = req.params;
-  if (!isValidObjectId(id)) {
-    next(httpError(400, `${id} is not valid id`));
-    return;
-  }
-  next();
-};
-
-export default { forId, forContactId, isValidId };
+export default { forId };
