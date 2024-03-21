@@ -329,6 +329,92 @@
           }
         }
       }
+    },
+    "/water/today": {
+      "get": {
+        "tags": ["Water-notes"],
+        "summary": "Get day`s water-notes",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "date",
+            "required": true,
+            "type": "string",
+            "description": "Day query",
+            "example": "2024-03-21"
+          }
+        ],
+        "security": [{ "Bearer": [] }],
+
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetDayWaterResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request ('date' must be in the 'yyyy-mm-dd' format)"
+          },
+          "401": {
+            "description": "Unauthorized (Not authorized)"
+          },
+          "404": {
+            "description": "Not Found (User not found)"
+          }
+        }
+      }
+    },
+    "/water/month": {
+      "get": {
+        "tags": ["Water-notes"],
+        "summary": "Get month`s water-notes",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "month",
+            "required": true,
+            "type": "integer",
+            "description": "Month query",
+            "example": "3"
+          },
+          {
+            "in": "query",
+            "name": "year",
+            "required": true,
+            "type": "integer",
+            "description": "Year query",
+            "example": "2024"
+          }
+        ],
+        "security": [{ "Bearer": [] }],
+
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetMonthWaterResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request (\"year\" is required || \"month\" is required)"
+          },
+          "401": {
+            "description": "Unauthorized (Not authorized)"
+          },
+          "404": {
+            "description": "Not Found (User not found)"
+          }
+        }
+      }
     }
   },
   "components": {
@@ -602,6 +688,114 @@
           "date": "2024-03-21T10:30:27.422Z",
           "owner": "65fae29587256ea591697177",
           "_id": "65fc0c43e03f046e3d94617d"
+        }
+      },
+      "GetDayWaterResponse": {
+        "type": "object",
+        "items": {
+          "type": "object",
+          "properties": {
+            "waterVolumeSum": {
+              "type": "integer",
+              "description": "Amount of water",
+              "example": "500"
+            },
+            "waterVolumes": {
+              "type": "array",
+              "properties": {
+                "waterAmount": {
+                  "type": "integer",
+                  "description": "Amount of water",
+                  "example": "300"
+                },
+                "date": {
+                  "type": "string",
+                  "description": "Time of record water-note",
+                  "example": "2024-03-21T10:21:49.606Z"
+                },
+                "owner": {
+                  "type": "string",
+                  "description": "Owner of water-note",
+                  "example": "65fae29587256ea591697277"
+                },
+                "_id": {
+                  "type": "string",
+                  "description": "Id of water-note",
+                  "example": "65fc0a3d04f3dc3c7a472741"
+                }
+              }
+            },
+            "waterVolumePercentage": {
+              "type": "integer",
+              "description": "Fulfillment of the daily norm",
+              "example": "25"
+            }
+          }
+        },
+        "example": {
+          "waterVolumeSum": 500,
+          "waterVolumes": [
+            {
+              "_id": "65fc0a3d04f3dc3c7a472741",
+              "waterAmount": 300,
+              "date": "2024-03-21T10:21:49.606Z",
+              "owner": "65fae29587256ea591697277"
+            },
+            {
+              "_id": "65fc0a6004f3dc3c7a472744",
+              "waterAmount": 200,
+              "date": "2024-03-21T10:22:24.002Z",
+              "owner": "65fae29587256ea591697277"
+            }
+          ],
+          "waterVolumePercentage": 25
+        }
+      },
+      "GetMonthWaterResponse": {
+        "type": "object",
+        "items": {
+          "type": "object",
+          "properties": {
+            "2024-03-21": {
+              "type": "object",
+              "properties": {
+                "date": {
+                  "type": "string",
+                  "description": "Date of record water-notes",
+                  "example": "21, March"
+                },
+                "portions": {
+                  "type": "integer",
+                  "description": "Number of portions of water",
+                  "example": "5"
+                },
+                "waterVolumePercentage": {
+                  "type": "integer",
+                  "description": "Fulfillment of the daily norm",
+                  "example": "48"
+                },
+                "dailyNorma": {
+                  "type": "integer",
+                  "description": "User's daily norma of water",
+                  "example": "2000"
+                }
+              }
+            }
+          }
+        },
+        "example": {
+          "2024-03-20": {
+            "date": "20, March",
+            "portions": 2,
+            "waterVolumePercentage": 22,
+            "dailyNorma": 2000
+          },
+          "2024-03-21": {
+            "date": "21, March",
+            "portions": 5,
+            "waterVolumePercentage": 48,
+            "dailyNorma": 2000
+          }
         }
       }
     },
