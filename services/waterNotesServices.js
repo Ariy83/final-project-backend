@@ -1,5 +1,5 @@
 import Water from "../models/WaterNote.js";
-import User from "../models/User.js";
+import userServices from "../services/userServices.js";
 import dateFormat from "../helpers/formatDate.js";
 import HttpError from "../helpers/HttpError.js";
 

@@ -28,7 +28,7 @@ waterNotesRouter.get(
   getTodayWaterNote
 );
 
-waterNotesRouter.delete("/id", isValidId.forId, deleteWaterNote);
+waterNotesRouter.delete("/:id", isValidId.forId, deleteWaterNote);
 
 waterNotesRouter.post(
   "/",
@@ -37,7 +37,7 @@ waterNotesRouter.post(
 );
 
 waterNotesRouter.put(
-  "/update/:Id",
+  "/:id",
   isValidId.forId,
   validateBody(waterSchemas.bodyValidation),
   updateWaterNote
