@@ -25,6 +25,10 @@
     {
       "name": "Users",
       "description": "Authorization endpoints"
+    },
+    {
+      "name": "Water-notes",
+      "description": "Water-notes endpoints"
     }
   ],
   "paths": {
@@ -211,6 +215,117 @@
           },
           "404": {
             "description": "Not Found (User not found!)"
+          }
+        }
+      }
+    },
+    "/water": {
+      "post": {
+        "tags": ["Water-notes"],
+        "summary": "Add water-note",
+        "parameters": [],
+        "security": [{ "Bearer": [] }],
+        "requestBody": {
+          "description": "Water-note object",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AddWaterRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AddWaterResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request (missing required waterAmount field || missing required date field)"
+          },
+          "401": {
+            "description": "Unauthorized (Not authorized)"
+          }
+        }
+      }
+    },
+    "/water/:id": {
+      "put": {
+        "tags": ["Water-notes"],
+        "summary": "Edit water-note",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "type": "string",
+            "description": "Water-note id"
+          }
+        ],
+        "security": [{ "Bearer": [] }],
+        "requestBody": {
+          "description": "Water-note object",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AddWaterRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AddWaterResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request (missing required waterAmount field || missing required date field)"
+          },
+          "401": {
+            "description": "Unauthorized (Not authorized)"
+          },
+          "404": {
+            "description": "Not Found (${id} is not valid id)"
+          }
+        }
+      },
+      "delete": {
+        "tags": ["Water-notes"],
+        "summary": "Delete water-note",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "type": "string",
+            "description": "Water-note id"
+          }
+        ],
+        "security": [{ "Bearer": [] }],
+
+        "responses": {
+          "200": {
+            "description": "Water deleted"
+          },
+          "401": {
+            "description": "Unauthorized (Not authorized)"
+          },
+          "404": {
+            "description": "Not Found (${id} is not valid id)"
           }
         }
       }
@@ -437,6 +552,56 @@
             "gender": "male || female",
             "avatarURL": "http://res.cloudinary.com/dooyixxpr/image/upload/v1710857369/avatars/lsxy0ihfqefuywlg9b0o.png"
           }
+        }
+      },
+      "AddWaterRequest": {
+        "type": "object",
+        "required": ["date", "waterAmount"],
+        "properties": {
+          "date": {
+            "type": "string",
+            "description": "Time of record water-note",
+            "example": "12:21"
+          },
+          "waterAmount": {
+            "type": "integer",
+            "description": "Amount of water",
+            "example": "250"
+          }
+        }
+      },
+      "AddWaterResponse": {
+        "type": "object",
+        "items": {
+          "type": "object",
+          "properties": {
+            "waterAmount": {
+              "type": "integer",
+              "description": "Amount of water",
+              "example": "250"
+            },
+            "date": {
+              "type": "string",
+              "description": "Time of record water-note",
+              "example": "12:21"
+            },
+            "owner": {
+              "type": "string",
+              "description": "Owner of water-note",
+              "example": "65fae29587256ea591697177"
+            },
+            "_id": {
+              "type": "string",
+              "description": "Id of water-note",
+              "example": "65fc0c43e03f046e3d94617d"
+            }
+          }
+        },
+        "example": {
+          "waterAmount": 350,
+          "date": "2024-03-21T10:30:27.422Z",
+          "owner": "65fae29587256ea591697177",
+          "_id": "65fc0c43e03f046e3d94617d"
         }
       }
     },
