@@ -60,10 +60,7 @@ export async function getWaterConsumptionDaySummary(owner, date) {
       $addFields: {
         waterVolumePercentage: {
           $round: {
-            $multiply: [
-              { $divide: ["$waterVolumeSum", dailyNormAmount * 1000] },
-              100,
-            ],
+            $multiply: [{ $divide: ["$waterVolumeSum", dailyNormAmount] }, 100],
           },
         },
       },
