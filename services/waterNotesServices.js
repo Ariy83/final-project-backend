@@ -99,16 +99,16 @@ export async function getWaterConsumptionMonthSummary(owner, year, month) {
 
   const waterConsumptionArray = await Water.aggregate([
     {
+      $match: {
+        owner: owner,
+        date: { $gte: firstDayOfMonth, $lt: lastDayOfMonth },
+      },
+    },
+    {
       $group: {
         _id: { $dateToString: { format: "%Y-%m-%d", date: "$date" } },
         waterVolumeSum: { $sum: "$waterAmount" },
         waterVolumes: { $push: "$$ROOT" },
-      },
-    },
-    {
-      $match: {
-        owner: owner,
-        date: { $gte: firstDayOfMonth, $lt: lastDayOfMonth },
       },
     },
     {
