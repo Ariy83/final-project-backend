@@ -23,14 +23,14 @@
   ],
   "tags": [
     {
-      "name": "Auth",
+      "name": "Users",
       "description": "Authorization endpoints"
     }
   ],
   "paths": {
     "/users/register": {
       "post": {
-        "tags": ["Auth"],
+        "tags": ["Users"],
         "summary": "User registration",
         "parameters": [],
         "requestBody": {
@@ -66,7 +66,7 @@
     },
     "/users/login": {
       "post": {
-        "tags": ["Auth"],
+        "tags": ["Users"],
         "summary": "User authentication",
         "parameters": [],
         "requestBody": {
@@ -102,7 +102,7 @@
     },
     "/users/logout": {
       "post": {
-        "tags": ["Auth"],
+        "tags": ["Users"],
         "summary": "Logout",
         "parameters": [],
         "security": [{ "Bearer": [] }],
@@ -118,7 +118,7 @@
     },
     "/users/current": {
       "get": {
-        "tags": ["Auth"],
+        "tags": ["Users"],
         "summary": "Get current user information",
         "parameters": [],
         "security": [{ "Bearer": [] }],
@@ -141,7 +141,7 @@
     },
     "/users/water-rate": {
       "patch": {
-        "tags": ["Auth"],
+        "tags": ["Users"],
         "summary": "Change user's daily norma of water",
         "parameters": [],
         "security": [{ "Bearer": [] }],
@@ -178,7 +178,7 @@
     },
     "/users/update": {
       "patch": {
-        "tags": ["Auth"],
+        "tags": ["Users"],
         "summary": "Update user",
         "parameters": [],
         "security": [{ "Bearer": [] }],

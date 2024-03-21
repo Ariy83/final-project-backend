@@ -84,8 +84,6 @@ export async function getWaterConsumptionDaySummary(owner, date) {
     ];
   }
 
-  console.log(waterConsumptionArray);
-
   return waterConsumptionArray;
 }
 
