@@ -574,7 +574,7 @@
             "description": "User's email",
             "format": "email"
           },
-          "old_password": {
+          "password": {
             "type": "string",
             "description": "User's old password"
           },
