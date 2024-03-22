@@ -52,15 +52,14 @@ authRouter.post(
   authControllers.forgotPassword
 );
 
+
+
 authRouter.post(
-  "/reset-password/",
+  "/reset-password",
   isResetTokenValid,
   authControllers.resetPassword
 );
 
-authRouter.post(
-  "/reset-password/:token/:id",
-  isResetTokenValid,
-  authControllers.resetPassword
-);
+
+
 export default authRouter;

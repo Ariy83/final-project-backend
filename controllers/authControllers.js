@@ -16,9 +16,10 @@ import webp from 'webp-converter';
 const {
   JWT_SECRET,
   BASE_URL,
-  TEMPLATE_ID,
+  WELCOME_EMAIL,
   SENDGRID_FROM,
-  TEMPLATE_ID_PASSWORD,
+  FORGOT_PASSWORD_EMAIL, CHANGED_PASSWORD_EMAIL,
+  BASE_URL2
 } = process.env;
 
 const register = async (req, res) => {
@@ -38,7 +39,7 @@ const register = async (req, res) => {
   const verifyEmail = {
     from: {
       email: SENDGRID_FROM,
-      name: "Water tracker",
+      name: "Welcome to Water tracker",
     },
     personalizations: [
       {
@@ -51,7 +52,7 @@ const register = async (req, res) => {
         },
       },
     ],
-    template_id: TEMPLATE_ID,
+    template_id: WELCOME_EMAIL,
   };
 
   await sendEmail(verifyEmail);
@@ -282,12 +283,12 @@ const forgotPassword = async (req, res) => {
         dynamic_template_data: {
           email: email,
           id: user._id.toString(),
-          BASE_URL: BASE_URL,
+          BASE_URL2: BASE_URL2,
           token: resetToken.token,
         },
       },
     ],
-    template_id: TEMPLATE_ID_PASSWORD,
+    template_id: FORGOT_PASSWORD_EMAIL,
   };
 
   await sendEmail(verifyEmail);
@@ -299,8 +300,12 @@ const forgotPassword = async (req, res) => {
 };
 
 const resetPassword = async (req, res) => {
-  const { password, email } = req.user;
+  const { password } = req.body;
+
+  
   const user = await User.findById(req.user._id);
+
+
   if (!user) {
     throw HttpError(404, "User not found!");
   }
@@ -321,18 +326,19 @@ const resetPassword = async (req, res) => {
   const verifyEmail = {
     from: {
       email: SENDGRID_FROM,
-      name: "You have changed your password",
+
+      name: "You have requested to changed your password",
     },
     personalizations: [
       {
-        to: [{ email: email }],
+        to: [{ email: user.email }],
 
         dynamic_template_data: {
-          email: email,
+          email: user.email
         },
       },
     ],
-    template_id: TEMPLATE_ID_PASSWORD,
+    template_id: CHANGED_PASSWORD_EMAIL,
   };
 
   await sendEmail(verifyEmail);
@@ -341,7 +347,10 @@ const resetPassword = async (req, res) => {
     success: true,
     message: "Password reset succesfully!",
   });
+
 };
+
+
 
 export default {
   register: ctrlWrapper(register),
@@ -353,5 +362,5 @@ export default {
   updateUser: ctrlWrapper(updateUser),
   updateWaterRate: ctrlWrapper(updateWaterRate),
   forgotPassword: ctrlWrapper(forgotPassword),
-  resetPassword: ctrlWrapper(resetPassword),
+  resetPassword: ctrlWrapper(resetPassword)
 };

@@ -4,8 +4,8 @@ import User from "../models/User.js";
 import ResetToken from "../models/ResetToken.js";
 
 const isResetTokenValid = async (req, res, next) => {
-  const { token, id } = req.query;
 
+  const {  token ,id} = req.body;
   if (!token || !id) {
     throw HttpError(404, "Invalid request!");
   }
@@ -31,6 +31,7 @@ const isResetTokenValid = async (req, res, next) => {
 
 
   req.user = user;
+
   next()
 
 };
