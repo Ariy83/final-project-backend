@@ -36,6 +36,7 @@ authRouter.patch(
   "/update",
   authenticate,
   upload.single("avatarURL"),
+  validateBody(usersSchemas.updateSchema),
   authControllers.updateUser
 );
 

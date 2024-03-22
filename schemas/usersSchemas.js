@@ -6,6 +6,15 @@ const signupSchema = Joi.object({
   email: Joi.string().pattern(emailRegexp).required(),
 });
 
+const updateSchema = Joi.object({
+  email: Joi.string().pattern(emailRegexp),
+  old_password: Joi.string().min(8).max(64),
+  new_password: Joi.string().min(8).max(64),
+  username: Joi.string().max(32),
+  gender: Joi.string().valid("male", "female"),
+  avatarURL: Joi.string(),
+});
+
 const waterRateChangeSchema = Joi.object({
   waterRate: Joi.number().required(),
 });
@@ -20,6 +29,7 @@ const forgotPassword = Joi.object({
 
 export default {
   signupSchema,
+  updateSchema,
   waterRateChangeSchema,
   verifySchema,
   forgotPassword,
