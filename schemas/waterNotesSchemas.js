@@ -22,6 +22,7 @@ const bodyValidation = Joi.object({
     .required()
     .messages({ "any.required": "missing required waterAmount field" }),
   date: Joi.string()
+    .regex(/^(?:[01]?\d|2[0-3])(?::[0-5]\d){1,2}$/)
     .required()
     .messages({ "any.required": "missing required date field" }),
 });
