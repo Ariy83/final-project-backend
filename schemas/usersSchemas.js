@@ -8,7 +8,7 @@ const signupSchema = Joi.object({
 
 const updateSchema = Joi.object({
   email: Joi.string().pattern(emailRegexp),
-  old_password: Joi.string().min(8).max(64),
+  password: Joi.string().min(8).max(64),
   new_password: Joi.string().min(8).max(64),
   username: Joi.string().max(32),
   gender: Joi.string().valid("male", "female"),
