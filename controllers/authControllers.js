@@ -11,15 +11,16 @@ import { unlink } from "fs/promises";
 import { nanoid } from "nanoid";
 import sendEmail from "../helpers/sendEmail.js";
 import ResetToken from "../models/ResetToken.js";
-import webp from 'webp-converter';
+import webp from "webp-converter";
 
 const {
   JWT_SECRET,
   BASE_URL,
   WELCOME_EMAIL,
   SENDGRID_FROM,
-  FORGOT_PASSWORD_EMAIL, CHANGED_PASSWORD_EMAIL,
-  BASE_URL2
+  FORGOT_PASSWORD_EMAIL,
+  CHANGED_PASSWORD_EMAIL,
+  BASE_URL2,
 } = process.env;
 
 const register = async (req, res) => {
@@ -78,7 +79,7 @@ const verify = async (req, res) => {
   );
 
   res.redirect(
-    "https://julika-gulchitai.github.io/capybara-components-frontend/signin?message=Verification%20successful"
+    "https://julika-gulchitai.github.io/capybara-components-frontend/signin"
   );
 };
 
@@ -179,40 +180,40 @@ const logout = async (req, res) => {
 };
 
 const updateUser = async (req, res) => {
-  const {_id: owner, password, avatarURL} = req.user;
-  const {new_password, password: old_password, email} = req.body;
-  const changedData = {...req.body};
+  const { _id: owner, password, avatarURL } = req.user;
+  const { new_password, password: old_password, email } = req.body;
+  const changedData = { ...req.body };
 
   if (old_password && new_password) {
     const user = await userServices.findUserById(owner);
     if (!user) {
-      throw HttpError(404, 'User not found!');
+      throw HttpError(404, "User not found!");
     }
 
     const passwordCompare = await bcrypt.compare(old_password, password);
     if (!passwordCompare) {
-      throw HttpError(401, 'Incorrect password!');
+      throw HttpError(401, "Incorrect password!");
     }
 
     changedData.password = await bcrypt.hash(new_password, 8);
   }
 
-  const user = await userServices.findUser({email});
+  const user = await userServices.findUser({ email });
   if (user) {
-    throw HttpError(409, 'Email is already used');
+    throw HttpError(409, "Email is already used");
   }
 
   if (req.file) {
-    const {path: filePath} = req.file;
-    const webpPath = `${filePath.split('.')[0]}.webp`;
+    const { path: filePath } = req.file;
+    const webpPath = `${filePath.split(".")[0]}.webp`;
     const image = await Jimp.read(filePath);
     await image.cover(250, 250).write(filePath);
-    await webp.cwebp(filePath, webpPath, '-q 100');
-    let {url: photo} = await cloudinary.uploader.upload(webpPath, {
-      folder: 'avatars'
+    await webp.cwebp(filePath, webpPath, "-q 100");
+    let { url: photo } = await cloudinary.uploader.upload(webpPath, {
+      folder: "avatars",
     });
 
-    photo = photo.replace('http', 'https')
+    photo = photo.replace("http", "https");
 
     changedData.avatarURL = photo;
     await unlink(filePath);
@@ -222,7 +223,7 @@ const updateUser = async (req, res) => {
   const newUser = await userServices.updateUser(owner, changedData);
 
   if (req.file && newUser) {
-    const avatar_id = avatarURL.split('/').pop().split('.')[0]
+    const avatar_id = avatarURL.split("/").pop().split(".")[0];
     await cloudinary.uploader.destroy(`avatars/${avatar_id}`);
   }
 
@@ -233,7 +234,7 @@ const updateUser = async (req, res) => {
       gender: newUser.gender,
       avatarURL: newUser.avatarURL,
       waterRate: newUser.waterRate,
-    }
+    },
   });
 };
 
@@ -296,9 +297,7 @@ const forgotPassword = async (req, res) => {
 const resetPassword = async (req, res) => {
   const { password } = req.body;
 
-  
   const user = await User.findById(req.user._id);
-
 
   if (!user) {
     throw HttpError(404, "User not found!");
@@ -328,7 +327,7 @@ const resetPassword = async (req, res) => {
         to: [{ email: user.email }],
 
         dynamic_template_data: {
-          email: user.email
+          email: user.email,
         },
       },
     ],
@@ -341,10 +340,7 @@ const resetPassword = async (req, res) => {
     success: true,
     message: "Password reset succesfully!",
   });
-
 };
-
-
 
 export default {
   register: ctrlWrapper(register),
@@ -356,5 +352,5 @@ export default {
   updateUser: ctrlWrapper(updateUser),
   updateWaterRate: ctrlWrapper(updateWaterRate),
   forgotPassword: ctrlWrapper(forgotPassword),
-  resetPassword: ctrlWrapper(resetPassword)
+  resetPassword: ctrlWrapper(resetPassword),
 };
