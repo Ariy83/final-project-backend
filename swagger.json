@@ -64,6 +64,9 @@
           },
           "409": {
             "description": "Conflict (Email in use)"
+          },
+          "500": {
+            "description": "Server error"
           }
         }
       }
@@ -100,6 +103,9 @@
           },
           "401": {
             "description": "Unauthorized (Email is wrong! || Email not verified! || Password is wrong! Try again!)"
+          },
+          "500": {
+            "description": "Server error"
           }
         }
       }
@@ -116,6 +122,9 @@
           },
           "401": {
             "description": "Unauthorized (Not authorized)"
+          },
+          "500": {
+            "description": "Server error"
           }
         }
       }
@@ -139,6 +148,9 @@
           },
           "401": {
             "description": "Unauthorized (Not authorized)"
+          },
+          "500": {
+            "description": "Server error"
           }
         }
       }
@@ -176,6 +188,9 @@
           },
           "401": {
             "description": "Unauthorized (Not authorized)"
+          },
+          "500": {
+            "description": "Server error"
           }
         }
       }
@@ -215,6 +230,9 @@
           },
           "404": {
             "description": "Not Found (User not found!)"
+          },
+          "500": {
+            "description": "Server error"
           }
         }
       }
@@ -252,6 +270,9 @@
           },
           "401": {
             "description": "Unauthorized (Not authorized)"
+          },
+          "500": {
+            "description": "Server error"
           }
         }
       }
@@ -300,6 +321,9 @@
           },
           "404": {
             "description": "Not Found (${id} is not valid id)"
+          },
+          "500": {
+            "description": "Server error"
           }
         }
       },
@@ -326,6 +350,9 @@
           },
           "404": {
             "description": "Not Found (${id} is not valid id)"
+          },
+          "500": {
+            "description": "Server error"
           }
         }
       }
@@ -365,6 +392,9 @@
           },
           "404": {
             "description": "Not Found (User not found)"
+          },
+          "500": {
+            "description": "Server error"
           }
         }
       }
@@ -412,6 +442,9 @@
           },
           "404": {
             "description": "Not Found (User not found)"
+          },
+          "500": {
+            "description": "Server error"
           }
         }
       }
