@@ -222,7 +222,7 @@ const updateUser = async (req, res) => {
 
   const newUser = await userServices.updateUser(owner, changedData);
 
-  if (req.file && newUser) {
+  if (req.file && newUser && avatarURL !== null) {
     const avatar_id = avatarURL.split("/").pop().split(".")[0];
     await cloudinary.uploader.destroy(`avatars/${avatar_id}`);
   }
