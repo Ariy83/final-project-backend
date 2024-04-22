@@ -1,4 +1,4 @@
-<h1 align="center"> 👨‍💻 TRACK OF WATER  👩‍💻 </h1>
+<h1 align="center"> 👨‍💻 TRACKER OF WATER  👩‍💻 </h1>
 
 <span align="center">
 
@@ -40,20 +40,20 @@
 water intake. The application consists of the following functional components:
 Welcome page, Home page, Water Journal, and Settings.
 
-![GitHub actions settings](./src/assets/welcome.jpg)
+![GitHub actions settings](./screenshots/welcome.jpg)
 
 ## Features
 
 - Home Page: Provides an overview of the application and quick access to other
-  features. ![GitHub actions settings](./src/assets/home.jpg)
+  features. ![GitHub actions settings](./screenshots/home.jpg)
 
 - Water Journal: Allows users to record their water consumption throughout the
-  day. ![GitHub actions settings](./src/assets/calendar.jpg)
+  day. ![GitHub actions settings](./screenshots/calendar.jpg)
 
 - Settings: Enables users to customize their profile, including adding a photo,
   specifying gender, name, and updating password or email.
 
-  ![GitHub actions settings](./src/assets/setting.jpg)
+  ![GitHub actions settings](./screenshots/setting.jpg)
 
 ## Platform Compatibility
 
@@ -61,7 +61,7 @@ The application is designed to be responsive and adaptable to desktop, tablet,
 and mobile devices. It has three breakpoints: 1440 pixels, 768 pixels, and 320
 pixels respectively.
 
-![GitHub actions settings](./src/assets/adapted.jpg)
+![GitHub actions settings](./screenshots/adapted.jpg)
 
 ## User Authentication
 
